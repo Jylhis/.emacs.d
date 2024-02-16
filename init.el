@@ -384,10 +384,6 @@ FILTER is function that runs after the process is finished, its args should be
 ;;(setq window-resize-pixelwise t)
 ;;(setq frame-resize-pixelwise t)
 
-
-
-
-
 ;; Store automatic customisation options elsewhere
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (when (file-exists-p custom-file)
@@ -396,7 +392,7 @@ FILTER is function that runs after the process is finished, its args should be
 ;;===============
 ;; UI
 ;;===============
-(set-frame-font "Menlo 10")
+(set-frame-font "Source Code Pro 10")
 (defalias 'yes-or-no #'y-or-n-p)
 (setq confirm-kill-emacs #'yes-or-no-p)
 
