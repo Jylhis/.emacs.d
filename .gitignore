@@ -78,3 +78,12 @@ flycheck_*.el
 .nfs*
 
 # End of https://www.toptal.com/developers/gitignore/api/emacs,linux,elisp
+
+*
+!/.gitignore
+!/.gitattributes
+!/.gitmodules
+!/.gitconfig
+!**/.gitkeep
+!init.el
+!README.md

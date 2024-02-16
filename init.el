@@ -22,9 +22,6 @@
 ;;; Code:
 
 
-;; TODO
-;; - Use straight.el
-
 
 ;; Performance tweaks for modern machines
 ;; max memory available for gc on startup
@@ -62,6 +59,82 @@
   ;; 1MB in bytes, default 4096 bytes
   (setq read-process-output-max 1048576))
 
+;; From https://github.com/KaratasFurkan/.emacs.d
+(defun dn-async-process (command &optional name filter)
+  "Start an async process by running the COMMAND string with bash. Return the
+process object for it.
+
+NAME is name for the process. Default is \"async-process\".
+
+FILTER is function that runs after the process is finished, its args should be
+\"(process output)\". Default is just messages the output."
+  (make-process
+   :command `("bash" "-c" ,command)
+   :name (if name name
+           "async-process")
+   :filter (if filter filter
+             (lambda (process output) (message (s-trim output)))))
+  )
+
+;; Straight bootstrap
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+(setq package-enable-at-startup nil)
+
+
+(use-package system-packages
+  :straight t)
+(use-package use-package-ensure-system-package
+  :straight t)
+(use-package auto-package-update
+  :straight t
+  :custom
+  (auto-package-update-delete-old-versions t)
+  (auto-package-update-hide-results t)
+  :config
+  (auto-package-update-maybe)
+  )
+
+;; Custom init
+(let (
+      (lsp-mode-disabled '(emacs-lisp-mode lisp-mode makefile-mode direnv-envrc-mode))
+      )
+  (progn
+    (unless (member system-type '(windows-nt ms-dos))
+      (add-to-list 'lsp-mode-disabled 'powershell-mode t)
+      )
+    (add-to-list 'lsp-mode-disabled 'bat-mode t)
+
+    (defcustom dn-lsp-mode-disabled lsp-mode-disabled
+      "List of modes for which lsp-mode is disabled"
+      :type '(repeat symbol)
+      :group 'dn)
+    )
+  )
+(use-package which-key
+  :straight t
+  :config
+  (which-key-mode))
+;(use-package ef-themes
+;  :ensure t
+;  :config
+;  (ef-themes-select 'ef-duo-light))
+
+
+
 ;; Resizing the Emacs frame can be a terribly expensive part of changing the
 ;; font. By inhibiting this, we easily halve startup times with fonts that are
 ;; larger than the system default.
@@ -70,7 +143,7 @@
 ;; highlight the current line
 (global-hl-line-mode t)
 
-
+(setq-default cursor-type 'bar)
 
 ;; always highlight code
 (global-font-lock-mode 1)
@@ -86,14 +159,7 @@
 (set-clipboard-coding-system 'utf-8)
 (set-buffer-file-coding-system 'utf-8)
 
-;;(use-package all-the-icons)
-;;(use-package all-the-icons-dired)
-;;(use-package-treemacs-all-the-icons
-;;:config
-;;(add-hook 'marginalia-mode-hook
-;;            #'all-the-icons-completion-marginalia-setup)
-;;  (all-the-icons-completion-mode 1)
-;; )
+
 
 (setq default-directory "~/"
       ;; always follow symlinks when opening files
@@ -146,6 +212,27 @@
 		      '(line-number-mode t)
 		      '(column-number-mode t))
 
+;; As you've probably noticed, Lisp has a lot of parentheses.
+;; Maintaining the syntactical correctness of these parentheses
+;; can be a pain when you're first getting started with Lisp,
+;; especially when you're fighting the urge to break up groups
+;; of closing parens into separate lines. Luckily we have
+;; Paredit, a package that maintains the structure of your
+;; parentheses for you. At first, Paredit might feel a little
+;; odd; you'll probably need to look at a tutorial (linked
+;; below) or read the docs before you can use it effectively.
+;; But once you pass that initial barrier you'll write Lisp
+;; code like it's second nature.
+;; http://danmidwood.com/content/2014/11/21/animated-paredit.html
+;; https://stackoverflow.com/a/5243421/3606440
+(use-package paredit
+  :straight t
+  :hook ((emacs-lisp-mode . enable-paredit-mode)
+         (lisp-mode . enable-paredit-mode)
+         (ielm-mode . enable-paredit-mode)
+         (lisp-interaction-mode . enable-paredit-mode)
+         (scheme-mode . enable-paredit-mode)))
+
 ;; Prefer spaces to tabs
 ;;(setq-default indent-tabs-mode nil)
 
@@ -192,7 +279,7 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives  '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
 
-(package-initialize)
+;;(package-initialize)
 ;; Unless we've already fetched (and cached) the package archives,
 ;; refresh them.
 (unless package-archive-contents
@@ -203,29 +290,8 @@
 
 (require 'use-package)
 
-;; Add the :vc keyword to use-package, making it easy to install
-;; packages directly from git repositories.
-;;(unless (package-installed-p 'vc-use-package)
-;;  (package-vc-install "https://github.com/slotThe/vc-use-package"))
-;;(require 'vc-use-package)
 
-;; A quick primer on the `use-package' function (refer to
-;; "C-h f use-package" for the full details).
-;;
-;; (use-package my-package-name
-;;   :ensure t    ; Ensure my-package is installed
-;;   :after foo   ; Load my-package after foo is loaded (seldom used)
-;;   :init        ; Run this code before my-package is loaded
-;;   :bind        ; Bind these keys to these functions
-;;   :custom      ; Set these variables
-;;   :config      ; Run this code after my-package is loaded
 
-;; A package with a great selection of themes:
-;; https://protesilaos.com/emacs/ef-themes
-(use-package ef-themes
-  :ensure t
-  :config
-  (ef-themes-select 'ef-duo-light))
 
 ;; Minibuffer completion is essential to your Emacs workflow and
 ;; Vertico is currently one of the best out there. There's a lot to
@@ -234,7 +300,7 @@
 ;; sweet of it is that you search for commands with "M-x do-thing" and
 ;; the minibuffer will show you a filterable list of matches.
 (use-package vertico
-  :ensure t
+  :straight t
   :custom
   (vertico-cycle t)
   (read-buffer-completion-ignore-case t)
@@ -248,7 +314,7 @@
 ;; "M-x find-file".
 (use-package marginalia
   :after vertico
-  :ensure t
+  :straight t
   :init
   (marginalia-mode))
 
@@ -257,7 +323,7 @@
 ;; search and understand. This configuration uses the keybindings 
 ;; recommended by the package author.
 (use-package helpful
-  :ensure t
+  :straight t
   :bind (("C-h f" . #'helpful-callable)
          ("C-h v" . #'helpful-variable)
          ("C-h k" . #'helpful-key)
@@ -267,67 +333,102 @@
 
 ;; An extremely feature-rich git client. Activate it with "C-c g".
 (use-package magit
-  :ensure t
+  :straight t
   :bind (("C-c g" . magit-status)))
 
-
-;; use-package with package.el:
 (use-package dashboard
-  :ensure t
+  :straight t
   :config
   (dashboard-setup-startup-hook))
-
 (setq ns-right-alternate-modifier 'none)
 
 (setq dashboard-items '((recents . 5)
 			(bookmarks . 5)
 			(projects . 5)))
 
-;; lsp-mode
-(use-package lsp-mode
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (XXX-mode . lsp)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
-  :custom
-  (lsp-headerline-breadcrumb-enable t)
-  :commands lsp)
+
+;;; Extended completion utilities
+(unless (package-installed-p 'consult)
+  (package-install 'consult))
+(global-set-key [rebind switch-to-buffer] #'consult-buffer)
+(global-set-key (kbd "C-c j") #'consult-line)
+(global-set-key (kbd "C-c i") #'consult-imenu)
+(setq read-buffer-completion-ignore-case t
+      read-file-name-completion-ignore-case t
+      completion-ignore-case t)
 
 
 
-;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
-;; if you are helm user
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
-;; if you are ivy user
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+;; Enable LSP support by default in programming buffers
+;;(add-hook 'prog-mode-hook #'eglot-ensure)
 
-;; optionally if you want to use debugger
-;; NOTE: Disabled due to package being broken
-;;(use-package dap-mode)
-;;(use-package dap-dlv-go)
+;;; Inline static analysis
 
-
-;; optional if you want which-key integration
-(use-package which-key
-  :config
-  (which-key-mode))
+;; Enabled inline static analysis
 
 
 ;; Flycheck
 (use-package flycheck
-  :ensure t
+  :straight t
   :init (global-flycheck-mode))
 
 
+
+;; Miscellaneous options
+(setq-default major-mode8
+              (lambda ()             ; guess major mode from file name
+                (unless buffer-file-name
+                  (let ((buffer-file-name (buffer-name)))
+                    (set-auto-mode)))))
+
+;;(setq window-resize-pixelwise t)
+;;(setq frame-resize-pixelwise t)
+
+
+
+
+
+;; Store automatic customisation options elsewhere
+(setq custom-file (locate-user-emacs-file "custom.el"))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
+;;===============
+;; UI
+;;===============
+(set-frame-font "Menlo 10")
+(defalias 'yes-or-no #'y-or-n-p)
+(setq confirm-kill-emacs #'yes-or-no-p)
+
+(use-package treemacs-icons-dired
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  :straight t)
+
+(use-package treemacs-magit
+  :after (treemacs magit)
+  :straight t)
+
+(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
+  :after (treemacs persp-mode) ;;or perspective vs. persp-mode
+  :straight t
+  :config (treemacs-set-scope-type 'Perspectives))
+
+(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
+  :after (treemacs)
+  :straight t
+  :config (treemacs-set-scope-type 'Tabs))
+
+(use-package treemacs-projectile
+  :straight t
+  :after (treemacs projectile)
+  )
+
 ;; Treemacs
 (use-package treemacs
-  :ensure t
+  :straight t
   :defer t
+  :commands (treemacs)
+  :after (lsp-mode)
   :init
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
@@ -414,118 +515,36 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
-(use-package treemacs-evil
-  :after (treemacs evil)
-  :ensure t)
 
-(use-package treemacs-projectile
-  :after (treemacs projectile)
-  :ensure t)
+(use-package all-the-icons
+  :straight t)
+(use-package all-the-icons-dired
+  :straight t)
 
-(use-package treemacs-icons-dired
-  :hook (dired-mode . treemacs-icons-dired-enable-once)
-  :ensure t)
+(use-package treemacs-all-the-icons
+  :straight t)
 
-(use-package treemacs-magit
-  :after (treemacs magit)
-  :ensure t)
+(use-package doom-themes
+  :straight t
+  :config
+  (load-theme 'doom-solarized-light t)
 
-(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
-  :after (treemacs persp-mode) ;;or perspective vs. persp-mode
-  :ensure t
-  :config (treemacs-set-scope-type 'Perspectives))
-
-(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
-  :after (treemacs)
-  :ensure t
-  :config (treemacs-set-scope-type 'Tabs))
-
-
-;; In addition to installing packages from the configured package
-;; registries, you can also install straight from version control
-;; with the :vc keyword argument. For the full list of supported
-;; fetchers, view the documentation for the variable
-;; `vc-use-package-fetchers'.
-;;
-;; Breadcrumb adds, well, breadcrumbs to the top of your open buffers
-;; and works great with project.el, the Emacs project manager.
-;;
-;; Read more about projects here:
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Projects.html
-;;(use-package breadcrumb
-;;  :vc (:fetcher github :repo joaotavora/breadcrumb)
-;;  :init (breadcrumb-mode))
-
-;; As you've probably noticed, Lisp has a lot of parentheses.
-;; Maintaining the syntactical correctness of these parentheses
-;; can be a pain when you're first getting started with Lisp,
-;; especially when you're fighting the urge to break up groups
-;; of closing parens into separate lines. Luckily we have
-;; Paredit, a package that maintains the structure of your
-;; parentheses for you. At first, Paredit might feel a little
-;; odd; you'll probably need to look at a tutorial (linked
-;; below) or read the docs before you can use it effectively.
-;; But once you pass that initial barrier you'll write Lisp
-;; code like it's second nature.
-;; http://danmidwood.com/content/2014/11/21/animated-paredit.html
-;; https://stackoverflow.com/a/5243421/3606440
-(use-package paredit
-  :ensure t
-  :hook ((emacs-lisp-mode . enable-paredit-mode)
-         (lisp-mode . enable-paredit-mode)
-         (ielm-mode . enable-paredit-mode)
-         (lisp-interaction-mode . enable-paredit-mode)
-         (scheme-mode . enable-paredit-mode)))
-
-(use-package go-mode
-  :ensure t
-  :bind (:map go-mode-map
-	      ("C-c C-f" . 'gofmt))
-  :hook (before-save . gofmt-before-save))
-
-(use-package yaml-mode
-  :ensure t)
-
-
-
-
-
-;; Load a custom theme
-;; Requires Emacs 28
-;; (load-theme 'modus-operandi t)
+(setq doom-themes-treemacs-theme "doom-solarized-light")
+(doom-themes-treemacs-config))
 
 ;; Disable splash screen
 (setq inhibit-startup-screen t)
 
+;;================
+;; Programming
+;;================
+(use-package diminish
+  :straight (:host github :repo "emacsmirror/diminish" :files ("*.el"))
+  :straight t)
 
-
-;; Enable completion by narrowing
-;;(vertico-mode t)
-
-;; Improve directory navigation
-;;(with-eval-after-load 'vertico
-;;  (define-key vertico-map (kbd "RET") #'vertico-directory-enter)
-;;  (define-key vertico-map (kbd "DEL") #'vertico-directory-delete-word)
-;;  (define-key vertico-map (kbd "M-d") #'vertico-directory-delete-char))
-
-;;; Extended completion utilities
-(unless (package-installed-p 'consult)
-  (package-install 'consult))
-(global-set-key [rebind switch-to-buffer] #'consult-buffer)
-(global-set-key (kbd "C-c j") #'consult-line)
-(global-set-key (kbd "C-c i") #'consult-imenu)
-(setq read-buffer-completion-ignore-case t
-      read-file-name-completion-ignore-case t
-      completion-ignore-case t)
-
-
-
-;; Enable LSP support by default in programming buffers
-;;(add-hook 'prog-mode-hook #'eglot-ensure)
-
-;;; Inline static analysis
-
-;; Enabled inline static analysis
+;; Automatically guess indent offsets, tab, spaces settings, etc.
+(use-package dtrt-indent
+  :straight t)
 
 
 
@@ -545,45 +564,304 @@
 ;; Remove trailing whitespace in files
 (autoload 'nuke-trailing-whitespace "whitespace" nil t)
 
-;;; Haskell Support
-(unless (package-installed-p 'haskell-mode)
-  (package-install 'haskell-mode))
+
+(use-package diff-mode
+  :straight t
+  :mode
+  "\\.patch[0-9]*\\'"
+  )
+
+;; EditorConfig
+(use-package editorconfig
+  :straight t
+  :config
+  (editorconfig-mode 1)
+  )
+(use-package editorconfig-generate
+  :straight t
+  )
+
+(use-package editorconfig-domain-specific
+  :straight t
+  )
+
+(use-package editorconfig-custom-majormode
+  :straight t)
+
+;; CI and build languages
+(use-package gitlab-ci-mode
+  :straight t
+  )
+
+(use-package make-mode
+  :straight nil
+  :init
+   (add-to-list 'auto-mode-alist '("Makefile$" . makefile-mode))
+  (add-to-list 'auto-mode-alist '("makefile$" . makefile-mode))
+  :mode ("Makefile\\'" "makefile\\'" "Make.obj\\'"))
+
+(use-package cmake-mode
+  :straight t
+  :mode
+  ("CMakeLists\\.txt\\'" "\\.cmake\\'")
+  )
+
+(use-package dockerfile-mode
+  :straight t
+  )
+
+
+(use-package docker-compose-mode
+  :straight t
+  )
+(use-package nix-mode
+  :straight t
+  :mode "\\.nix\\'")
+
+;; Config and markup languages
+(use-package hcl-mode
+  :straight t
+  )
+
 
 ;;; JSON Support
-(unless (package-installed-p 'json-mode)
-  (package-install 'json-mode))
+(use-package json-mode
+  :straight t
+  :mode "\\.json\\'"
+  ;:after (tree-sitter)
+  )
 
 ;;; Markdown support
 (unless (package-installed-p 'markdown-mode)
   (package-install 'markdown-mode))
 
-;;; EditorConfig support
-(unless (package-installed-p 'editorconfig)
-  (package-install 'editorconfig))
-
-;; Enable EditorConfig
-(editorconfig-mode t)
-
-;; GitLab
-(use-package gitlab-ci-mode)
-
-(use-package make-mode)
-
-;; Miscellaneous options
-(setq-default major-mode8
-              (lambda ()             ; guess major mode from file name
-                (unless buffer-file-name
-                  (let ((buffer-file-name (buffer-name)))
-                    (set-auto-mode)))))
-(setq confirm-kill-emacs #'yes-or-no-p)
-;;(setq window-resize-pixelwise t)
-;;(setq frame-resize-pixelwise t)
+(use-package markdown-toc
+  :straight t
+  :after markdown-mode
+)
 
 
+;; Languages
+;;; Haskell Support
+(unless (package-installed-p 'haskell-mode)
+  (package-install 'haskell-mode))
 
-(defalias 'yes-or-no #'y-or-n-p)
+(use-package go-mode
+  :straight t
+  :bind (:map go-mode-map
+	      ("C-c C-f" . 'gofmt))
+  :hook (before-save . gofmt-before-save))
 
-;; Store automatic customisation options elsewhere
-(setq custom-file (locate-user-emacs-file "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file))
+(use-package yaml-mode
+  :straight t)
+
+;; Python
+(use-package highlight-indentation
+  :straight t)
+(use-package python
+  :straight nil
+  :init
+  (progn
+    (add-hook 'python-mode-hook 'highlight-indentation-mode)
+    ;; (add-hook 'python-mode-hook 'eldoc-mode)
+    (add-hook 'python-mode-hook 'sphinx-doc-mode))
+  :bind (:map python-mode-map
+	      (
+               ("C-c i" . python-insert-docstring-with-google-style-at-point)
+               ))
+  :config
+
+  (when (executable-find "ipython")
+    (setq
+     python-shell-interpreter "ipython"
+     python-shell-interpreter-args ""
+     python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+     python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+     python-shell-completion-setup-code
+     "from IPython.core.completerlib import module_completion"
+     python-shell-completion-string-code
+     "';'.join(module_completion('''%s'''))\n"
+     python-shell-completion-string-code
+     "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
+  )
+(use-package python-insert-docstring
+  :straight t)
+(use-package blacken
+  :straight t)
+
+(use-package python-black
+  :straight t)
+
+(use-package lsp-pyright
+  :straight t
+  :after lsp-mode
+  :hook (python-mode . (lambda ()
+                         (config-unless-system 'darwin
+                           (require 'lsp-pyright)
+                           (lsp-deferred))))
+  :custom
+  (lsp-pyright-auto-import-completions nil)
+  (lsp-pyright-typechecking-mode "off")
+  (lsp-pyright-python-executable-cmd "python3")
+  :config
+  (dn-async-process
+   "npm outdated -g | grep pyright | wc -l" nil
+   (lambda (process output)
+     (pcase output
+       ("0\n" (message "Pyright is up to date."))
+       ("1\n" (message "A pyright update is available.")))))
+  )
+
+(use-package pyvenv
+  :straight t
+  :after python
+  :config
+  (defun dn-activate-pyvenv ()
+    "Activate python environment according to the `.venv' file."
+    (interactive)
+    (pyvenv-mode)
+    (let* ((pdir (projectile-project-root)) (pfile (concat pdir ".venv")))
+      (if (file-exists-p pfile)
+          (pyvenv-workon (with-temp-buffer
+                           (insert-file-contents pfile)
+                           (nth 0 (split-string (buffer-string))))))))
+  )
+
+(use-package cython-mode
+  :straight t
+  :mode (("\\.pyx\\'"  . cython-mode)
+         ("\\.spyx\\'" . cython-mode)
+         ("\\.pxd\\'"  . cython-mode)
+         ("\\.pxi\\'"  . cython-mode)))
+
+;; lsp-mode
+(use-package lsp-mode
+  :straight t
+  :defines lsp-language-id-configuration
+  :hook ((prog-mode . (lambda ()
+                        (unless (cl-some 'derived-mode-p dn-lsp-mode-disabled)
+                          (lsp-deferred))
+                        ))
+         (lsp-mode . lsp-enable-which-key-integration))
+  ;; :config
+  ;; (add-to-list 'lsp-language-id-configuration
+  ;;              '(cuda-mode . "cuda"))
+  ;; (lsp-register-client
+  ;;  (make-lsp-client :new-connection (lsp-stdio-connection
+  ;;                                    'lsp-clients--clangd-command)
+  ;;                   :activation-fn (lsp-activate-on "cuda")
+  ;;                   :priority -1
+  ;;                   :server-id 'clangd
+  ;;                   :download-server-fn (lambda (_client callback error-callback _update?)
+  ;;                                         (lsp-package-ensure 'clangd callback error-callback))))
+  :custom
+  (lsp-use-plists t)
+  (gc-cons-threshold (* 100 1024 1024))
+  (read-process-output-max (* 3 1024 1024))
+
+  ;; (treemacs-space-between-root-nodes nil)
+
+  (lsp-auto-guess-root t)
+  (lsp-modeline-diagnostics-enable nil)
+  (lsp-before-save-edits nil)
+  (lsp-idle-delay 0.3)
+  (lsp-completion-provider :capf)
+  ;; Prevent constant auto-formatting...)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-enable-indentation nil)
+  ;; be more ide-ish)
+  (lsp-headerline-breadcrumb-enable t)
+  ;; python-related settings)
+  (lsp-pyls-plugins-autopep8-enabled nil)
+  (lsp-pyls-plugins-yapf-enabled t)
+  )
+;; Taken from https://tychoish.com/post/emacs-and-lsp-mode/
+(use-package lsp-ui
+  :straight t
+  :after (lsp-mode)
+  :commands lsp-ui-doc-hide
+  :bind (:map lsp-ui-mode-map
+              ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+              ([remap xref-find-references] . lsp-ui-peek-find-references)
+              ("C-c u" . lsp-ui-imenu))
+  :custom
+  (lsp-ui-doc-alignment 'at-point)
+  (lsp-ui-doc-border (face-foreground 'default))
+  (lsp-ui-doc-delay 0.3)
+  (lsp-ui-doc-enable t)
+  (lsp-ui-doc-header t)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-position 'top)
+  (lsp-ui-doc-use-childframe t)
+  ;; (lsp-ui-doc-use-webkit nil)
+  (lsp-ui-peek-enable t)
+  (lsp-ui-peek-show-directory t)
+  (lsp-ui-sideline-delay 0.5)
+  (lsp-ui-sideline-enable t)
+  (lsp-ui-sideline-ignore-duplicate t)
+  (lsp-ui-sideline-show-code-actions t)
+  (lsp-ui-sideline-show-diagnostics t)
+  (lsp-ui-sideline-show-hover nil)
+  (lsp-ui-sideline-update-mode 'line)
+  ;; :custom-face
+  ;; (lsp-ui-peek-highlight ((t (:inherit nil :background nil :foreground nil :weight semi-bold :box (:line-width -1)))))
+  :config
+  ;; (add-to-list 'lsp-ui-doc-frame-parameters '(right-fringe . 8))
+
+  ;; `C-g'to close doc
+  (advice-add #'keyboard-quit :before #'lsp-ui-doc-hide)
+
+  ;; Reset `lsp-ui-doc-background' after loading theme
+  (add-hook 'after-load-theme-hook
+            (lambda ()
+              (setq lsp-ui-doc-border (face-foreground 'default))
+              (set-face-background 'lsp-ui-doc-background
+                                   (face-background 'tooltip))))
+
+  (defun lsp-update-server ()
+    "Update LSP server."
+    (interactive)
+    ;; Equals to `C-u M-x lsp-install-server'
+    (lsp-install-server t))
+  )
+
+;; Debug
+(use-package dap-mode
+  :straight t
+  :defines dap-python-executable
+  :functions dap-hydra/nil
+  :diminish
+  :after (lsp-mode)
+  :functions dap-hydra/nil
+  :custom
+  (dap-auto-configure-mode t)
+  (dap-tooltip-mode 1)
+  (dap-ui-controls-mode 1)
+  (dap-auto-configure-features
+   '(sessions locals breakpoints expressions controls tooltip))
+  :hook ((dap-mode . dap-ui-mode)
+         (dap-session-created . (lambda (&_rest) (dap-hydra)))
+         (dap-stopped . (lambda (_args) (dap-hydra)))
+         (dap-terminated . (lambda (&_rest) (dap-hydra/nil)))
+         (python-mode . (lambda () (require 'dap-python)))
+         (diff-mode . (lambda () (dap-mode -1)))
+         (powershell-mode . (lambda () (dap-mode -1)))
+         (shell-script-mode . (lambda () (dap-mode -1)))
+         (cmake-mode . (lambda () (dap-mode -1)))
+         ((c-mode c++-mode objc-mode swift-mode) . (lambda () (require 'dap-lldb)))
+         (powershell-mode . (lambda () (require 'dap-pwsh))))
+  :init
+  (when (executable-find "python3")
+    (setq dap-python-executable "python3"))
+  (require 'dap-cpptools)
+  (require 'dap-lldb)
+  (require 'dap-gdb-lldb)
+  )
+(use-package lsp-treemacs
+  :after (lsp-mode treemacs)
+  :straight t
+  :commands lsp-treemacs-errors-list
+  :init (lsp-treemacs-sync-mode 1)
+  ;; :bind (:map lsp-mode-map
+  ;;        ("M-9" . lsp-treemacs-errors-list))
+  )
