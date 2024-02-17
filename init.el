@@ -76,6 +76,26 @@ FILTER is function that runs after the process is finished, its args should be
              (lambda (process output) (message (s-trim output)))))
   )
 
+(defun set-frame-size-according-to-resolution ()
+  (interactive)
+  (if window-system
+  (progn
+    ;; use 120 char wide window for largeish displays
+    ;; and smaller 80 column windows for smaller displays
+    ;; pick whatever numbers make sense for you
+    (if (> (x-display-pixel-width) 1280)
+           (add-to-list 'default-frame-alist (cons 'width 150))
+           (add-to-list 'default-frame-alist (cons 'width 80)))
+    ;; for the height, subtract a couple hundred pixels
+    ;; from the screen height (for panels, menubars and
+    ;; whatnot), then divide by the height of a char to
+    ;; get the height we want
+    (add-to-list 'default-frame-alist 
+         (cons 'height (/ (- (x-display-pixel-height) 200)
+                             (frame-char-height)))))))
+
+(set-frame-size-according-to-resolution)
+
 ;; Straight bootstrap
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -347,6 +367,17 @@ FILTER is function that runs after the process is finished, its args should be
 			(projects . 5)))
 
 
+;; Projectile
+(use-package projectile
+  :straight t
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-mode-map
+              ("s-p" . projectile-command-map)
+              ("C-c p" . projectile-command-map)))
+
+(use-package yasnippet
+  :straight t)
 ;;; Extended completion utilities
 (unless (package-installed-p 'consult)
   (package-install 'consult))
@@ -392,7 +423,7 @@ FILTER is function that runs after the process is finished, its args should be
 ;;===============
 ;; UI
 ;;===============
-(set-frame-font "Source Code Pro 10")
+(set-frame-font "Source Code Pro 12")
 (defalias 'yes-or-no #'y-or-n-p)
 (setq confirm-kill-emacs #'yes-or-no-p)
 
