@@ -91,7 +91,7 @@ FILTER is function that runs after the process is finished, its args should be
     ;; whatnot), then divide by the height of a char to
     ;; get the height we want
     (add-to-list 'default-frame-alist 
-         (cons 'height (/ (- (x-display-pixel-height) 200)
+         (cons 'height (/ (- (x-display-pixel-height) 150)
                              (frame-char-height)))))))
 
 (set-frame-size-according-to-resolution)
@@ -303,7 +303,9 @@ FILTER is function that runs after the process is finished, its args should be
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives  '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
 
-;;(package-initialize)
+(when (< emacs-major-version 27)
+  (package-initialize))
+
 ;; Unless we've already fetched (and cached) the package archives,
 ;; refresh them.
 (unless package-archive-contents
@@ -313,6 +315,7 @@ FILTER is function that runs after the process is finished, its args should be
   (package-install 'use-package))
 
 (require 'use-package)
+
 
 
 
@@ -560,8 +563,15 @@ FILTER is function that runs after the process is finished, its args should be
   :config
   (load-theme 'doom-solarized-light t)
 
-(setq doom-themes-treemacs-theme "doom-solarized-light")
-(doom-themes-treemacs-config))
+  (setq doom-themes-treemacs-theme "doom-colors")
+  (doom-themes-treemacs-config)
+  )
+
+
+(use-package solaire-mode
+  :straight t
+  :config
+  (solaire-global-mode +1))
 
 ;; Disable splash screen
 (setq inhibit-startup-screen t)
@@ -656,10 +666,15 @@ FILTER is function that runs after the process is finished, its args should be
 
 
 ;;; JSON Support
+(use-package json-snatcher
+  :straight t
+  )
 (use-package json-mode
   :straight t
   :mode "\\.json\\'"
-  ;:after (tree-sitter)
+  :after
+  (json-snatcher)
+					;:after (tree-sitter)
   )
 
 ;;; Markdown support
