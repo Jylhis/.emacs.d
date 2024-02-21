@@ -265,6 +265,10 @@ FILTER is function that runs after the process is finished, its args should be
 ;; Keep track of open files
 (recentf-mode t)
 
+(global-set-key (kbd "C-x <up>") #'other-window)
+(global-set-key (kbd "C-x <down>") #'previous-window-any-frame)
+
+
 ;; Keep files up-to-date when they change outside Emacs
 (global-auto-revert-mode t)
 
