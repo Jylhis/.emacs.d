@@ -562,10 +562,15 @@ FILTER is function that runs after the process is finished, its args should be
   :straight t
   :config
   (load-theme 'doom-solarized-light t)
+  (load-theme 'doom-solarized-dark t)
 
   (setq doom-themes-treemacs-theme "doom-colors")
   (doom-themes-treemacs-config)
   )
+
+(if (display-graphic-p)
+    (enable-theme 'doom-solarized-light)
+    (enable-theme 'doom-solarized-dark))
 
 
 (use-package solaire-mode
