@@ -938,4 +938,5 @@ FILTER is function that runs after the process is finished, its args should be
       '(:weight bold :slant italic)
       )
 
-(global-set-key (kbd "<tab>") #'company-indent-or-complete-common)
+;;(global-set-key (kbd "<tab>") #'company-indent-or-complete-common)
+
