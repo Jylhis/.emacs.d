@@ -9,6 +9,11 @@ apt install clangd
 
 # Nix profile
 nix profile install github:nixos/nixpkgs#nixd nixpkgs#gopls nixpkgs#godef nixpkgs#delve nixpkgs#source-code-pro nixpkgs#clang
+
+# Haskell
+ghcup install hls
+
+haskell-language-server-
 ```
 
 In emacs remember to run

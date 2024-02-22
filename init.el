@@ -788,6 +788,12 @@ FILTER is function that runs after the process is finished, its args should be
          ("\\.pxd\\'"  . cython-mode)
          ("\\.pxi\\'"  . cython-mode)))
 
+(use-package lsp-haskell
+  :straight t
+  :after lsp-mode
+  :config
+  (add-hook 'haskell-mode-hook #'lsp)
+(add-hook 'haskell-literate-mode-hook #'lsp))
 ;; lsp-mode
 (use-package lsp-mode
   :straight t
