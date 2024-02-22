@@ -5,7 +5,10 @@ go install golang.org/x/tools/gopls@latest
 go install github.com/rogpeppe/godef@latest
 go install github.com/go-delve/delve/cmd/dlv@latest
 curl -L https://github.com/hbin/top-programming-fonts/raw/master/install.sh | bash
-nix profile install github:nixos/nixpkgs#nixd nixpkgs#gopls nixpkgs#godef nixpkgs#delve nixpkgs#source-code-pro
+apt install clangd
+
+# Nix profile
+nix profile install github:nixos/nixpkgs#nixd nixpkgs#gopls nixpkgs#godef nixpkgs#delve nixpkgs#source-code-pro nixpkgs#clang
 ```
 
 In emacs remember to run
