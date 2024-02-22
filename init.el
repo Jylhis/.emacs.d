@@ -94,7 +94,7 @@ FILTER is function that runs after the process is finished, its args should be
          (cons 'height (/ (- (x-display-pixel-height) 150)
                              (frame-char-height)))))))
 
-(set-frame-size-according-to-resolution)
+;;(set-frame-size-according-to-resolution)
 
 ;; Straight bootstrap
 (defvar bootstrap-version)
@@ -230,7 +230,8 @@ FILTER is function that runs after the process is finished, its args should be
 ;; Always show matching paranthesis, line and column number
 (custom-set-variables '(show-paren-mode 1)
 		      '(line-number-mode t)
-		      '(column-number-mode t))
+		      '(column-number-mode t)
+		      '(initial-frame-alist (quote ((fullscreen . maximized)))))
 
 ;; As you've probably noticed, Lisp has a lot of parentheses.
 ;; Maintaining the syntactical correctness of these parentheses
@@ -370,7 +371,6 @@ FILTER is function that runs after the process is finished, its args should be
 (setq ns-right-alternate-modifier 'none)
 
 (setq dashboard-items '((recents . 5)
-			(bookmarks . 5)
 			(projects . 5)))
 
 
@@ -385,6 +385,9 @@ FILTER is function that runs after the process is finished, its args should be
 
 (use-package yasnippet
   :straight t)
+
+(yas-reload-all)
+(add-hook 'prog-mode-hook #'yas-minor-mode)
 ;;; Extended completion utilities
 (unless (package-installed-p 'consult)
   (package-install 'consult))
@@ -916,3 +919,23 @@ FILTER is function that runs after the process is finished, its args should be
   ;; :bind (:map lsp-mode-map
   ;;        ("M-9" . lsp-treemacs-errors-list))
   )
+
+;; Company
+(use-package company
+  :straight t)
+
+(add-hook 'after-init-hook 'global-company-mode)
+
+
+					; No delay in showing suggestions.
+(setq company-idle-delay 0
+      company-minimum-prefix-length 3
+      company-selection-wrap-around t
+      company-tooltip-align-annotations t
+      company-tooltip-annotation-padding 1
+      company-tooltip-flip-when-above t
+      company-text-face-extra-attributes
+      '(:weight bold :slant italic)
+      )
+
+(global-set-key (kbd "<tab>") #'company-indent-or-complete-common)
