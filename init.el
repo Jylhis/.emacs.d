@@ -202,7 +202,7 @@
 
 ;; Adds intellisense-style code completion at point that works great
 ;; Add extra context to Emacs documentation to help make it easier to
-;; search and understand. This configuration uses the keybindings 
+;; search and understand. This configuration uses the keybindings
 ;; recommended by the package author.
 (use-package helpful
   :straight t
@@ -219,8 +219,8 @@
   :bind (("C-c g" . magit-status))
   :config
   ;; Show word-granularity differences within diff hunks
-(setq magit-diff-refine-hunk t)
-)
+  (setq magit-diff-refine-hunk t)
+  )
 
 (use-package dashboard
   :straight t
@@ -422,7 +422,7 @@
 
 (if (display-graphic-p)
     (enable-theme 'doom-solarized-light)
-    (enable-theme 'doom-solarized-dark))
+  (enable-theme 'doom-solarized-dark))
 
 
 (use-package solaire-mode
@@ -489,7 +489,7 @@
 (use-package make-mode
   :straight nil
   :init
-   (add-to-list 'auto-mode-alist '("Makefile$" . makefile-mode))
+  (add-to-list 'auto-mode-alist '("Makefile$" . makefile-mode))
   (add-to-list 'auto-mode-alist '("makefile$" . makefile-mode))
   :mode ("Makefile\\'" "makefile\\'" "Make.obj\\'"))
 
@@ -535,7 +535,7 @@
 (use-package markdown-toc
   :straight t
   :after markdown-mode
-)
+  )
 
 
 ;; Languages
@@ -600,8 +600,8 @@
   :after lsp-mode
   :hook (python-mode . (lambda ()
                          (config-unless-system 'darwin
-                           (require 'lsp-pyright)
-                           (lsp-deferred))))
+					       (require 'lsp-pyright)
+					       (lsp-deferred))))
   :custom
   (lsp-pyright-auto-import-completions nil)
   (lsp-pyright-typechecking-mode "off")
@@ -636,7 +636,7 @@
   :after lsp-mode
   :config
   (add-hook 'haskell-mode-hook #'lsp)
-(add-hook 'haskell-literate-mode-hook #'lsp))
+  (add-hook 'haskell-literate-mode-hook #'lsp))
 
 ;; lsp-mode
 (use-package lsp-mode
