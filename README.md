@@ -8,12 +8,15 @@ curl -L https://github.com/hbin/top-programming-fonts/raw/master/install.sh | ba
 apt install clangd
 
 # Nix profile
-nix profile install github:nixos/nixpkgs#nixd nixpkgs#gopls nixpkgs#godef nixpkgs#delve nixpkgs#source-code-pro nixpkgs#clang
+nix profile install github:nixos/nixpkgs#nixd nixpkgs#gopls nixpkgs#godef nixpkgs#delve nixpkgs#source-code-pro nixpkgs#clang nixpkgs#asm-lsp
 
 # Haskell
 ghcup install hls
 
 haskell-language-server-
+
+# ansible
+npm i -g @ansible/ansible-language-server
 ```
 
 In emacs remember to run

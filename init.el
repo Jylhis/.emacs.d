@@ -72,22 +72,7 @@
   (auto-package-update-maybe)
   )
 
-;; Custom init
-(let (
-      (lsp-mode-disabled '(emacs-lisp-mode lisp-mode makefile-mode direnv-envrc-mode))
-      )
-  (progn
-    (unless (member system-type '(windows-nt ms-dos))
-      (add-to-list 'lsp-mode-disabled 'powershell-mode t)
-      )
-    (add-to-list 'lsp-mode-disabled 'bat-mode t)
 
-    (defcustom dn-lsp-mode-disabled lsp-mode-disabled
-      "List of modes for which lsp-mode is disabled"
-      :type '(repeat symbol)
-      :group 'dn)
-    )
-  )
 (use-package which-key
   :straight t
   :config
@@ -543,14 +528,16 @@
 (use-package haskell-mode
   :straight t)
 
-
 (use-package go-mode
   :straight t
+  :after
+  (lsp-mode)
   :bind (:map go-mode-map
  	      ("C-c C-f" . 'gofmt))
-  :hook (before-save . gofmt-before-save)
+  ;:hook (before-save . gofmt-before-save)
   :config
-  (add-hook 'go-mode-hook 'lsp-deferred)
+  (add-hook 'go-mode-hook #'lsp-deferred)
+(add-hook 'go-mode-hook #'yas-minor-mode)
   )
 
 (use-package yaml-mode
@@ -599,14 +586,14 @@
   :straight t
   :after lsp-mode
   :hook (python-mode . (lambda ()
-                         (config-unless-system 'darwin
-					       (require 'lsp-pyright)
-					       (lsp-deferred))))
-  :custom
+                          (require 'lsp-pyright)
+                          (lsp)))
+  
+  :config
   (lsp-pyright-auto-import-completions nil)
   (lsp-pyright-typechecking-mode "off")
   (lsp-pyright-python-executable-cmd "python3")
-  :config
+
   )
 
 (use-package pyvenv
@@ -631,22 +618,43 @@
          ("\\.pxd\\'"  . cython-mode)
          ("\\.pxi\\'"  . cython-mode)))
 
-(use-package lsp-haskell
+(use-package tree-sitter
   :straight t
-  :after lsp-mode
   :config
-  (add-hook 'haskell-mode-hook #'lsp)
-  (add-hook 'haskell-literate-mode-hook #'lsp))
+
+)
+(use-package tree-sitter-langs
+  :straight t
+  :after tree-sitter)
+
+  (global-tree-sitter-mode)
+
 
 ;; lsp-mode
 (use-package lsp-mode
   :straight t
   :defines lsp-language-id-configuration
-  :hook ((prog-mode . (lambda ()
-                        (unless (cl-some 'derived-mode-p dn-lsp-mode-disabled)
-                          (lsp-deferred))
-                        ))
-         (lsp-mode . lsp-enable-which-key-integration))
+  :hook (
+         (lsp-mode . lsp-enable-which-key-integration)
+	 (go-mode . lsp)
+	 (c-mode . lsp)
+	 (c++-mode . lsp)
+	 (python-mode . lsp)
+	 (haskell-mode . lsp)
+	 (asm-mode . lsp)
+	 (shell-script-mode . lsp)
+	 (cmake-mode . lsp)
+	 (dockerfile-mode . lsp)
+	 (html-mode . lsp)
+	 (javascript-mode . lsp)
+	 (typescript-ts-mode . lsp)
+	 (json-mode . lsp)
+	 (markdown-mode . lsp)
+	 (nix-mode . lsp)
+	 (semgrep-mode . lsp)
+	 (terraform-mode . lsp)
+	 )
+  :commands lsp
   :custom
   (lsp-use-plists t)
   (gc-cons-threshold (* 100 1024 1024))
@@ -761,12 +769,9 @@
 
 ;; Company
 (use-package company
-  :straight t)
-
-(add-hook 'after-init-hook 'global-company-mode)
-
-
-;; No delay in showing suggestions.
+  :straight t
+  :config
+  ;; No delay in showing suggestions.
 (setq company-idle-delay 0
       company-minimum-prefix-length 1
       company-selection-wrap-around t
@@ -776,3 +781,18 @@
       company-text-face-extra-attributes
       '(:weight bold :slant italic)
       )
+      (add-hook 'after-init-hook 'global-company-mode)
+)
+
+
+
+
+(use-package lsp-haskell
+  :straight t
+  :after lsp-mode
+  :config
+  (add-hook 'haskell-mode-hook #'lsp)
+  (add-hook 'haskell-literate-mode-hook #'lsp))
+
+(provide 'init)
+;;; init.el ends here
