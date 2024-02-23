@@ -1,27 +1,8 @@
-;;; -*- lexical-binding: t; -*-
+;;; package -- Init  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 
-;; Save the contents of this file to ~/.config/emacs/init.el and
-;; you're ready to boot up Emacs.
-
-;; Hack this file! One of the best ways to get started with Emacs is
-;; to look at other peoples' configurations and extract the pieces
-;; that work for you. That's where this configuration started. I
-;; encourage you to read through the code in this file and explore the
-;; functions and variables using the built-in help system (details
-;; below). Happy hacking!
-
-;; "C-<chr>  means hold the CONTROL key while typing the character <chr>.
-;; Thus, C-f would be: hold the CONTROL key and type f." (Emacs tutorial)
-;;
-;; - C-h t: Start the Emacs tutorial
-;; - C-h o some-symbol: Describe symbol
-;; - C-h C-q: Pull up the quick-help cheatsheet
-
 ;;; Code:
-
-
 
 ;; Performance tweaks for modern machines
 ;; max memory available for gc on startup
@@ -33,13 +14,12 @@
             (setq gc-cons-threshold me/gc-cons-threshold
                   gc-cons-percentage 0.1)))
 
-;; max memory available for gc when opening minibuffer
 (defun me/defer-garbage-collection-h ()
+  "Max memory available for gc when opening minibuffer."
   (setq gc-cons-threshold most-positive-fixnum))
 
 (defun me/restore-garbage-collection-h ()
-  ;; Defer it so that commands launched immediately after will enjoy the
-  ;; benefits.
+  "Defer it so that commands launched immediately after will enjoy the benefits."
   (run-at-time
    1 nil (lambda () (setq gc-cons-threshold me/gc-cons-threshold))))
 
@@ -49,7 +29,7 @@
 
 (setq read-process-output-max (* 1024 1024)) ; 1mb
 (defvar comp-deferred-compliation)
-(setq comp-deferred-compilation t)
+
 (setq package-enable-at-startup nil)
 
 (setq site-run-file nil)
@@ -59,42 +39,6 @@
   ;; 1MB in bytes, default 4096 bytes
   (setq read-process-output-max 1048576))
 
-;; From https://github.com/KaratasFurkan/.emacs.d
-(defun dn-async-process (command &optional name filter)
-  "Start an async process by running the COMMAND string with bash. Return the
-process object for it.
-
-NAME is name for the process. Default is \"async-process\".
-
-FILTER is function that runs after the process is finished, its args should be
-\"(process output)\". Default is just messages the output."
-  (make-process
-   :command `("bash" "-c" ,command)
-   :name (if name name
-           "async-process")
-   :filter (if filter filter
-             (lambda (process output) (message (s-trim output)))))
-  )
-
-(defun set-frame-size-according-to-resolution ()
-  (interactive)
-  (if window-system
-  (progn
-    ;; use 120 char wide window for largeish displays
-    ;; and smaller 80 column windows for smaller displays
-    ;; pick whatever numbers make sense for you
-    (if (> (x-display-pixel-width) 1280)
-           (add-to-list 'default-frame-alist (cons 'width 150))
-           (add-to-list 'default-frame-alist (cons 'width 80)))
-    ;; for the height, subtract a couple hundred pixels
-    ;; from the screen height (for panels, menubars and
-    ;; whatnot), then divide by the height of a char to
-    ;; get the height we want
-    (add-to-list 'default-frame-alist 
-         (cons 'height (/ (- (x-display-pixel-height) 150)
-                             (frame-char-height)))))))
-
-;;(set-frame-size-according-to-resolution)
 
 ;; Straight bootstrap
 (defvar bootstrap-version)
@@ -148,12 +92,6 @@ FILTER is function that runs after the process is finished, its args should be
   :straight t
   :config
   (which-key-mode))
-;(use-package ef-themes
-;  :ensure t
-;  :config
-;  (ef-themes-select 'ef-duo-light))
-
-
 
 ;; Resizing the Emacs frame can be a terribly expensive part of changing the
 ;; font. By inhibiting this, we easily halve startup times with fonts that are
@@ -184,8 +122,6 @@ FILTER is function that runs after the process is finished, its args should be
 (setq default-directory "~/"
       ;; always follow symlinks when opening files
       vc-follow-symlinks t
-      ;; overwrite text when selected, like we expect.
-      delete-seleciton-mode t
       ;; quiet startup
       inhibit-startup-message t
       initial-scratch-message nil
@@ -201,61 +137,25 @@ FILTER is function that runs after the process is finished, its args should be
       enable-local-variables t
       ;; life is too short to type yes or no
       use-short-answers t
-
-      ;; clean up dired buffers
-      dired-kill-when-opening-new-dired-buffer t)
-
+      )
 ;; use human-readable sizes in dired
 (setq-default dired-listing-switches "-alh")
 
 ;; Remove extra UI clutter by hiding the scrollbar, menubar, and toolbar.
-;;(menu-bar-mode -1)
-;;(tool-bar-mode -1)
+(menu-bar-mode -1)
+(tool-bar-mode -1)
 ;;(scroll-bar-mode -1)
-
-;; Set the font. Note: height = px * 100
-;;(set-face-attribute 'default nil :font "Ubuntu Mono" :height 120)
-
-;; Add unique buffer names in the minibuffer where there are many
-;; identical files. This is super useful if you rely on folders for
-;; organization and have lots of files with the same name,
-;; e.g. foo/index.ts and bar/index.ts.
-(require 'uniquify)
 
 ;; Automatically insert closing parens
 (electric-pair-mode t)
 
 ;; Visualize matching parens
-;;(show-paren-mode 1)
+(show-paren-mode 1)
 ;; Always show matching paranthesis, line and column number
 (custom-set-variables '(show-paren-mode 1)
 		      '(line-number-mode t)
 		      '(column-number-mode t)
 		      '(initial-frame-alist (quote ((fullscreen . maximized)))))
-
-;; As you've probably noticed, Lisp has a lot of parentheses.
-;; Maintaining the syntactical correctness of these parentheses
-;; can be a pain when you're first getting started with Lisp,
-;; especially when you're fighting the urge to break up groups
-;; of closing parens into separate lines. Luckily we have
-;; Paredit, a package that maintains the structure of your
-;; parentheses for you. At first, Paredit might feel a little
-;; odd; you'll probably need to look at a tutorial (linked
-;; below) or read the docs before you can use it effectively.
-;; But once you pass that initial barrier you'll write Lisp
-;; code like it's second nature.
-;; http://danmidwood.com/content/2014/11/21/animated-paredit.html
-;; https://stackoverflow.com/a/5243421/3606440
-(use-package paredit
-  :straight t
-  :hook ((emacs-lisp-mode . enable-paredit-mode)
-         (lisp-mode . enable-paredit-mode)
-         (ielm-mode . enable-paredit-mode)
-         (lisp-interaction-mode . enable-paredit-mode)
-         (scheme-mode . enable-paredit-mode)))
-
-;; Prefer spaces to tabs
-;;(setq-default indent-tabs-mode nil)
 
 ;; Automatically save your place in files
 (save-place-mode t)
@@ -275,52 +175,6 @@ FILTER is function that runs after the process is finished, its args should be
 
 ;; Display line numbers only when in programming modes
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-
-;; The `setq' special form is used for setting variables. Remember
-;; that you can look up these variables with "C-h v variable-name".
-(setq uniquify-buffer-name-style 'forward
-      window-resize-pixelwise t
-      frame-resize-pixelwise t
-      load-prefer-newer t
-      backup-by-copying t
-      ;; Backups are placed into your Emacs directory, e.g. ~/.config/emacs/backups
-      backup-directory-alist `(("." . ,(concat user-emacs-directory "backups")))
-      ;; I'll add an extra note here since user customizations are important.
-      ;; Emacs actually offers a UI-based customization menu, "M-x customize".
-      ;; You can use this menu to change variable values across Emacs. By default,
-      ;; changing a variable will write to your init.el automatically, mixing
-      ;; your hand-written Emacs Lisp with automatically-generated Lisp from the
-      ;; customize menu. The following setting instead writes customizations to a
-      ;; separate file, custom.el, to keep your init.el clean.
-      custom-file (expand-file-name "custom.el" user-emacs-directory))
-
-;; Bring in package utilities so we can install packages from the web.
-(require 'package)
-
-;; Add MELPA, an unofficial (but well-curated) package registry to the
-;; list of accepted package registries. By default Emacs only uses GNU
-;; ELPA and NonGNU ELPA, https://elpa.gnu.org/ and
-;; https://elpa.nongnu.org/ respectively.
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives  '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
-
-(when (< emacs-major-version 27)
-  (package-initialize))
-
-;; Unless we've already fetched (and cached) the package archives,
-;; refresh them.
-(unless package-archive-contents
-  (package-refresh-contents))
-
-(unless (package-installed-p 'use-package)        ; Unless "use-package" is installed, install "use-package"
-  (package-install 'use-package))
-
-(require 'use-package)
-
-
-
-
-
 ;; Minibuffer completion is essential to your Emacs workflow and
 ;; Vertico is currently one of the best out there. There's a lot to
 ;; dive in here so I recommend checking out the documentation for more
@@ -362,17 +216,21 @@ FILTER is function that runs after the process is finished, its args should be
 ;; An extremely feature-rich git client. Activate it with "C-c g".
 (use-package magit
   :straight t
-  :bind (("C-c g" . magit-status)))
+  :bind (("C-c g" . magit-status))
+  :config
+  ;; Show word-granularity differences within diff hunks
+(setq magit-diff-refine-hunk t)
+)
 
 (use-package dashboard
   :straight t
   :config
-  (dashboard-setup-startup-hook))
-(setq ns-right-alternate-modifier 'none)
+  (dashboard-setup-startup-hook)
+  (setq ns-right-alternate-modifier 'none)
 
-(setq dashboard-items '((recents . 5)
-			(projects . 5)))
-
+  (setq dashboard-items '((recents . 5)
+ 			  (projects . 5)))
+  )
 
 ;; Projectile
 (use-package projectile
@@ -384,28 +242,29 @@ FILTER is function that runs after the process is finished, its args should be
               ("C-c p" . projectile-command-map)))
 
 (use-package yasnippet
-  :straight t)
+  :straight t
+  :config
+  (yas-reload-all)
+  (add-hook 'prog-mode-hook #'yas-minor-mode)
+  )
 
-(yas-reload-all)
-(add-hook 'prog-mode-hook #'yas-minor-mode)
-;;; Extended completion utilities
-(unless (package-installed-p 'consult)
-  (package-install 'consult))
-(global-set-key [rebind switch-to-buffer] #'consult-buffer)
-(global-set-key (kbd "C-c j") #'consult-line)
-(global-set-key (kbd "C-c i") #'consult-imenu)
-(setq read-buffer-completion-ignore-case t
-      read-file-name-completion-ignore-case t
-      completion-ignore-case t)
+(use-package yasnippet-snippets
+  :straight t
+  :after (yasnippet))
 
 
+;; Extended completion utilities
+(use-package consult
+  :straight t
+  :config
+  (global-set-key [rebind switch-to-buffer] #'consult-buffer)
+  (global-set-key (kbd "C-c j") #'consult-line)
+  (global-set-key (kbd "C-c i") #'consult-imenu)
+  (setq read-buffer-completion-ignore-case t
+        read-file-name-completion-ignore-case t
+        completion-ignore-case t)
 
-;; Enable LSP support by default in programming buffers
-;;(add-hook 'prog-mode-hook #'eglot-ensure)
-
-;;; Inline static analysis
-
-;; Enabled inline static analysis
+  )
 
 
 ;; Flycheck
@@ -444,16 +303,6 @@ FILTER is function that runs after the process is finished, its args should be
 (use-package treemacs-magit
   :after (treemacs magit)
   :straight t)
-
-(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
-  :after (treemacs persp-mode) ;;or perspective vs. persp-mode
-  :straight t
-  :config (treemacs-set-scope-type 'Perspectives))
-
-(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
-  :after (treemacs)
-  :straight t
-  :config (treemacs-set-scope-type 'Tabs))
 
 (use-package treemacs-projectile
   :straight t
@@ -595,24 +444,19 @@ FILTER is function that runs after the process is finished, its args should be
 (use-package dtrt-indent
   :straight t)
 
+;; ;; Enable autocompletion by default in programming buffers
+;;(add-hook 'prog-mode-hook #'corfu-mode)
 
-
-;; Enable autocompletion by default in programming buffers
-(add-hook 'prog-mode-hook #'corfu-mode)
-
-;; Show word-granularity differences within diff hunks
-(setq magit-diff-refine-hunk t)
 
 ;;; Indication of local VCS changes
-(unless (package-installed-p 'diff-hl)
-  (package-install 'diff-hl))
-
-;; Enable `diff-hl' support by default in programming buffers
-(add-hook 'prog-mode-hook #'diff-hl-mode)
+(use-package diff-hl
+  :straight t
+  :config
+  (add-hook 'prog-mode-hook #'diff-hl-mode)
+  )
 
 ;; Remove trailing whitespace in files
 (autoload 'nuke-trailing-whitespace "whitespace" nil t)
-
 
 (use-package diff-mode
   :straight t
@@ -682,12 +526,11 @@ FILTER is function that runs after the process is finished, its args should be
   :mode "\\.json\\'"
   :after
   (json-snatcher)
-					;:after (tree-sitter)
   )
 
 ;;; Markdown support
-(unless (package-installed-p 'markdown-mode)
-  (package-install 'markdown-mode))
+(use-package markdown-mode
+  :straight t)
 
 (use-package markdown-toc
   :straight t
@@ -697,14 +540,18 @@ FILTER is function that runs after the process is finished, its args should be
 
 ;; Languages
 ;;; Haskell Support
-(unless (package-installed-p 'haskell-mode)
-  (package-install 'haskell-mode))
+(use-package haskell-mode
+  :straight t)
+
 
 (use-package go-mode
   :straight t
   :bind (:map go-mode-map
-	      ("C-c C-f" . 'gofmt))
-  :hook (before-save . gofmt-before-save))
+ 	      ("C-c C-f" . 'gofmt))
+  :hook (before-save . gofmt-before-save)
+  :config
+  (add-hook 'go-mode-hook 'lsp-deferred)
+  )
 
 (use-package yaml-mode
   :straight t)
@@ -714,6 +561,8 @@ FILTER is function that runs after the process is finished, its args should be
   :straight t)
 (use-package python
   :straight nil
+  :after
+  (highlight-indentation)
   :init
   (progn
     (add-hook 'python-mode-hook 'highlight-indentation-mode)
@@ -758,12 +607,6 @@ FILTER is function that runs after the process is finished, its args should be
   (lsp-pyright-typechecking-mode "off")
   (lsp-pyright-python-executable-cmd "python3")
   :config
-  (dn-async-process
-   "npm outdated -g | grep pyright | wc -l" nil
-   (lambda (process output)
-     (pcase output
-       ("0\n" (message "Pyright is up to date."))
-       ("1\n" (message "A pyright update is available.")))))
   )
 
 (use-package pyvenv
@@ -794,6 +637,7 @@ FILTER is function that runs after the process is finished, its args should be
   :config
   (add-hook 'haskell-mode-hook #'lsp)
 (add-hook 'haskell-literate-mode-hook #'lsp))
+
 ;; lsp-mode
 (use-package lsp-mode
   :straight t
@@ -803,17 +647,6 @@ FILTER is function that runs after the process is finished, its args should be
                           (lsp-deferred))
                         ))
          (lsp-mode . lsp-enable-which-key-integration))
-  ;; :config
-  ;; (add-to-list 'lsp-language-id-configuration
-  ;;              '(cuda-mode . "cuda"))
-  ;; (lsp-register-client
-  ;;  (make-lsp-client :new-connection (lsp-stdio-connection
-  ;;                                    'lsp-clients--clangd-command)
-  ;;                   :activation-fn (lsp-activate-on "cuda")
-  ;;                   :priority -1
-  ;;                   :server-id 'clangd
-  ;;                   :download-server-fn (lambda (_client callback error-callback _update?)
-  ;;                                         (lsp-package-ensure 'clangd callback error-callback))))
   :custom
   (lsp-use-plists t)
   (gc-cons-threshold (* 100 1024 1024))
@@ -933,9 +766,9 @@ FILTER is function that runs after the process is finished, its args should be
 (add-hook 'after-init-hook 'global-company-mode)
 
 
-					; No delay in showing suggestions.
+;; No delay in showing suggestions.
 (setq company-idle-delay 0
-      company-minimum-prefix-length 3
+      company-minimum-prefix-length 1
       company-selection-wrap-around t
       company-tooltip-align-annotations t
       company-tooltip-annotation-padding 1
@@ -943,6 +776,3 @@ FILTER is function that runs after the process is finished, its args should be
       company-text-face-extra-attributes
       '(:weight bold :slant italic)
       )
-
-;;(global-set-key (kbd "<tab>") #'company-indent-or-complete-common)
-
