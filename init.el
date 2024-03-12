@@ -122,7 +122,10 @@
       enable-local-variables t
       ;; life is too short to type yes or no
       use-short-answers t
+      backup-directory-alist '((".*" . ,temporary-file-directory))
       )
+
+
 ;; use human-readable sizes in dired
 (setq-default dired-listing-switches "-alh")
 
@@ -225,6 +228,11 @@
   :bind (:map projectile-mode-map
               ("s-p" . projectile-command-map)
               ("C-c p" . projectile-command-map)))
+
+(use-package projectile-ripgrep
+  :straight t
+  :after projectile)
+
 
 (use-package yasnippet
   :straight t
