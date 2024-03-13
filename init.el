@@ -158,6 +158,8 @@
 (global-set-key (kbd "C-x <down>") #'previous-window-any-frame)
 
 
+(global-set-key (kbd "M-p") 'ace-window)
+
 ;; Keep files up-to-date when they change outside Emacs
 (global-auto-revert-mode t)
 
@@ -228,6 +230,9 @@
   :bind (:map projectile-mode-map
               ("s-p" . projectile-command-map)
               ("C-c p" . projectile-command-map)))
+
+
+
 
 (use-package projectile-ripgrep
   :straight t
