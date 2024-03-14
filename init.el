@@ -399,6 +399,7 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
+(delete-selection-mode t)
 
 (use-package all-the-icons
   :straight t)
@@ -419,7 +420,8 @@
   )
 
 (if (display-graphic-p)
-    (enable-theme 'doom-solarized-light)
+    ;;(enable-theme 'doom-solarized-light)
+    (enable-theme 'doom-solarized-dark)
   (enable-theme 'doom-solarized-dark))
 
 
