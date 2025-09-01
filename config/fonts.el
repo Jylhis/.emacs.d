@@ -215,7 +215,7 @@ This ensures consistent fonts across daemon and client sessions."
 
 ;;; Global Keybindings
 
-(global-set-key (kbd "C-=") #'j10s-fonts-increase-size)
+(global-set-key (kbd "C-+") #'j10s-fonts-increase-size)
 (global-set-key (kbd "C--") #'j10s-fonts-decrease-size)
 (global-set-key (kbd "C-0") #'j10s-fonts-reset-size)
 (global-set-key (kbd "C-c f i") #'j10s-fonts-info)
