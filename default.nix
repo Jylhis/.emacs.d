@@ -42,7 +42,6 @@ emacs.pkgs.withPackages (
     consult-eglot
     consult-eglot-embark
     consult-flyspell
-    copilot
     corfu
     csv-mode
     cuda-mode
