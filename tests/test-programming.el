@@ -98,12 +98,7 @@
   :tags '(unit fast programming)
   (should (assoc '(go-mode go-ts-mode) eglot-server-programs)))
 
-(ert-deftest test-consult-eglot-available ()
-  "Verify consult-eglot integration."
-  :tags '(unit programming)
-  (when (test-helper-package-available-p 'consult-eglot)
-    (let ((map eglot-mode-map))
-      (should (eq (lookup-key map (kbd "C-M-.")) 'consult-eglot-symbols)))))
+;; consult-eglot integration test moved to tests/integration/test-lsp-workflow.el
 
 ;;; Xref
 

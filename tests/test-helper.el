@@ -22,6 +22,11 @@
 ;; This is needed for (require 'utils) and other relative requires to work
 (setq user-emacs-directory test-user-emacs-directory)
 
+;; Initialize package system to set up autoloads
+(require 'package)
+(setq package-enable-at-startup nil)
+(package-initialize)
+
 ;; Mock package.el to prevent installation in tests
 (defun test-helper-mock-package-system ()
   "Mock package.el functions to prevent installation in tests."
@@ -44,7 +49,9 @@
   (advice-add 'recentf-save-list :override #'ignore)
   ;; Mock super-save
   (advice-add 'super-save-command :override #'ignore)
-  (advice-add 'super-save-command-advice :override #'ignore))
+  (advice-add 'super-save-command-advice :override #'ignore)
+  ;; Mock org-clock-save
+  (advice-add 'org-clock-save :override #'ignore))
 
 (test-helper-mock-write-operations)
 

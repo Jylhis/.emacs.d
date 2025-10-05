@@ -51,13 +51,7 @@
   ;; Eglot automatically enables flymake
   (should (fboundp 'flymake-mode)))
 
-(ert-deftest test-flymake-keybindings ()
-  "Test flymake keybindings for LSP diagnostics."
-  :tags '(integration lsp keybindings)
-  (let ((map flymake-mode-map))
-    (should (keymapp map))
-    (should (eq (lookup-key map (kbd "M-n")) 'flymake-goto-next-error))
-    (should (eq (lookup-key map (kbd "M-p")) 'flymake-goto-prev-error))))
+;; flymake-keybindings test moved to tests/test-programming.el
 
 ;;; LSP Server Configuration
 

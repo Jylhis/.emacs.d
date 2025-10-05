@@ -73,21 +73,11 @@ version 2
       (should smerge-mode)
       (should (smerge-find-conflict)))))
 
-(ert-deftest test-smerge-keybindings ()
-  "Test smerge keybindings work."
-  :tags '(integration git keybindings)
-  (let ((map smerge-mode-map))
-    (should (keymapp map))
-    (should (eq (lookup-key map (kbd "C-c ^ u")) 'smerge-keep-upper))
-    (should (eq (lookup-key map (kbd "C-c ^ l")) 'smerge-keep-lower))))
+;; smerge-keybindings test moved to tests/test-git.el
 
 ;;; Ediff
 
-(ert-deftest test-ediff-configuration ()
-  "Test ediff is properly configured."
-  :tags '(integration git)
-  (should (eq ediff-window-setup-function 'ediff-setup-windows-plain))
-  (should (eq ediff-split-window-function 'split-window-horizontally)))
+;; ediff-configuration test moved to tests/test-git.el
 
 ;;; Git File Modification Workflow
 
