@@ -105,10 +105,7 @@
   :tags '(unit fast completion)
   (should (eq prefix-help-command 'embark-prefix-help-command)))
 
-(ert-deftest test-embark-consult-integration ()
-  "Verify embark-consult integration."
-  :tags '(unit completion)
-  (should (test-helper-package-available-p 'embark-consult)))
+;; embark-consult integration test moved to tests/integration/test-completion-workflow.el
 
 ;;; Avy
 
