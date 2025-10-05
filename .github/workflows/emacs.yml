@@ -7,9 +7,32 @@ on:
       - "**.el"
       - "**.nix"
       - "flake.*"
+      - "justfile"
+      - "tests/**"
+      - "nmt-tests/**"
+  pull_request:
+    paths:
+      - "**.el"
+      - "**.nix"
+      - "flake.*"
+      - "justfile"
+      - "tests/**"
+      - "nmt-tests/**"
   workflow_dispatch:
+
 jobs:
-  nix-package:
+  formatting:
+    name: Check formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: DeterminateSystems/determinate-nix-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Check Nix formatting
+        run: nix build .#checks.x86_64-linux.formatting
+
+  ert-tests:
+    name: ERT unit and integration tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -19,5 +42,46 @@ jobs:
         with:
           name: jylhis
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - run: nix flake check
-      - run: nix build
+      - name: Run ERT tests
+        run: nix build .#checks.x86_64-linux.emacs-tests --print-build-logs
+
+  nmt-tests:
+    name: NMT home-manager module tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - test-emacs-config-files
+          - test-shell-aliases
+          - test-emacs-service
+          - test-font-packages
+          - test-module-disabled
+          - test-fileset-source
+    steps:
+      - uses: actions/checkout@v5
+      - uses: DeterminateSystems/determinate-nix-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - uses: cachix/cachix-action@v16
+        with:
+          name: jylhis
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - name: Run ${{ matrix.test }}
+        run: nix build .#checks.x86_64-linux.${{ matrix.test }} --print-build-logs
+
+  build:
+    name: Build Emacs package
+    runs-on: ubuntu-latest
+    needs: [formatting, ert-tests, nmt-tests]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: DeterminateSystems/determinate-nix-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - uses: cachix/cachix-action@v16
+        with:
+          name: jylhis
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - name: Build default package
+        run: nix build --print-build-logs
+      - name: Build config package
+        run: nix build .#config --print-build-logs
