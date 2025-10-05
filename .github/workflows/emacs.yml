@@ -19,7 +19,6 @@ on:
       - "tests/**"
       - "nmt-tests/**"
   workflow_dispatch:
-
 jobs:
   formatting:
     name: Check formatting
@@ -30,7 +29,6 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Check Nix formatting
         run: nix build .#checks.x86_64-linux.formatting
-
   ert-tests:
     name: ERT unit and integration tests
     runs-on: ubuntu-latest
@@ -44,7 +42,6 @@ jobs:
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Run ERT tests
         run: nix build .#checks.x86_64-linux.emacs-tests --print-build-logs
-
   nmt-tests:
     name: NMT home-manager module tests
     runs-on: ubuntu-latest
@@ -68,7 +65,6 @@ jobs:
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Run ${{ matrix.test }}
         run: nix build .#checks.x86_64-linux.${{ matrix.test }} --print-build-logs
-
   build:
     name: Build Emacs package
     runs-on: ubuntu-latest
