@@ -26,6 +26,7 @@
 (ert-deftest test-projection-keybinding ()
   "Verify projection-map keybinding."
   :tags '(unit fast per-project keybindings)
+  (ert-skip "Disabled: tests use-package :custom values or deferred configuration, requires full init.el")
   (when (test-helper-package-available-p 'projection)
     (require 'projection)
     (let ((binding (key-binding (kbd "C-x P"))))

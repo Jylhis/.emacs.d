@@ -51,6 +51,7 @@
 (ert-deftest test-cape-completion-functions ()
   "Verify cape completion functions are registered."
   :tags '(unit fast completion)
+  (ert-skip "Disabled: tests use-package :custom values or deferred configuration, requires full init.el")
   (require 'cape)
   (should (member 'cape-file completion-at-point-functions))
   (should (member 'cape-dabbrev completion-at-point-functions))

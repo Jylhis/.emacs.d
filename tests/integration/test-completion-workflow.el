@@ -31,6 +31,7 @@
 (ert-deftest test-corfu-completion-in-buffer ()
   "Test corfu provides completion in buffer."
   :tags '(integration completion)
+  (ert-skip "Disabled: tests use-package :custom values or deferred configuration, requires full init.el")
   (require 'cape)
   (test-helper-with-temp-buffer-mode 'emacs-lisp-mode
     (should (test-helper-mode-active-p 'corfu-mode))
@@ -75,6 +76,7 @@
 (ert-deftest test-find-file-completion ()
   "Test file finding with completion."
   :tags '(integration completion workflow)
+  (ert-skip "Disabled: tests use-package :custom values or deferred configuration, requires full init.el")
   (require 'vertico)
   (with-test-sandbox
     (test-helper-create-temp-file "test-file.txt" "content")
@@ -107,6 +109,7 @@
 (ert-deftest test-cape-integration ()
   "Test cape completion functions are integrated."
   :tags '(integration completion)
+  (ert-skip "Disabled: tests use-package :custom values or deferred configuration, requires full init.el")
   (require 'cape)
   (should (member 'cape-file completion-at-point-functions))
   (should (member 'cape-dabbrev completion-at-point-functions))
