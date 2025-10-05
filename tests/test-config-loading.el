@@ -7,6 +7,10 @@
 
 (require 'test-helper)
 
+;; Load init.el to test that all modules can be loaded
+;; This is safe because test-helper has mocked package.el
+(load (expand-file-name "init.el" test-user-emacs-directory))
+
 (ert-deftest test-platform-module-loads ()
   "Verify platform module loads correctly."
   :tags '(unit fast config)

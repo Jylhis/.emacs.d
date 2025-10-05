@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'test-helper)
+(require 'ui)
 
 ;;; Theme Configuration
 

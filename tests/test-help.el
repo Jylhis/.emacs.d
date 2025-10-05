@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'test-helper)
+(require 'help)
 
 ;;; Help-at-pt
 

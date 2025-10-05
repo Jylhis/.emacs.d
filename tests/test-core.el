@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'test-helper)
+(require 'core)
 
 ;;; Basic Emacs Settings
 

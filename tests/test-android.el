@@ -7,6 +7,7 @@
 ;;; Code:
 
 (require 'test-helper)
+;; Platform is already loaded by test-helper
 
 ;;; Platform Detection
 

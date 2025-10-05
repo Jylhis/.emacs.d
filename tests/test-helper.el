@@ -8,17 +8,42 @@
 
 (require 'ert)
 
-;; Load configuration from the parent directory
-(setq user-emacs-directory (expand-file-name "../" (file-name-directory load-file-name)))
+;; Set up paths WITHOUT loading init.el
+(defvar test-user-emacs-directory
+  (expand-file-name "../" (file-name-directory load-file-name))
+  "Path to the Emacs configuration directory for testing.")
 
-;; Add load paths
-(add-to-list 'load-path (expand-file-name "." user-emacs-directory))
-(add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
-(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+;; Add load paths for modules and utilities
+(add-to-list 'load-path test-user-emacs-directory)
+(add-to-list 'load-path (expand-file-name "config" test-user-emacs-directory))
+(add-to-list 'load-path (expand-file-name "lisp" test-user-emacs-directory))
 
-;; Load the configuration
-;; Note: This will load init.el which loads all modules
-(load (expand-file-name "init.el" user-emacs-directory))
+;; Set user-emacs-directory to test sandbox to avoid write errors
+(setq user-emacs-directory
+      (expand-file-name "sandbox" (file-name-directory load-file-name)))
+
+;; Mock package.el to prevent installation in tests
+(defun test-helper-mock-package-system ()
+  "Mock package.el functions to prevent installation in tests."
+  ;; Prevent package-vc-install from trying to install packages
+  (advice-add 'package-vc-install :override #'ignore)
+  (advice-add 'package-refresh-contents :override #'ignore)
+  (advice-add 'package-install :override #'ignore)
+  ;; Prevent package initialization
+  (setq package-enable-at-startup nil))
+
+;; Always mock package system in tests
+(test-helper-mock-package-system)
+
+;; Load only platform detection (required by many modules)
+(require 'platform)
+
+;; Disable features that require write access
+(setq savehist-mode nil)
+(setq recentf-mode nil)
+(setq super-save-mode nil)
+
+;; Individual test files will load modules as needed using (require 'module-name)
 
 ;;; Test Sandbox Utilities
 

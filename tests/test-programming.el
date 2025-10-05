@@ -7,6 +7,7 @@
 ;;; Code:
 
 (require 'test-helper)
+(require 'programming)
 
 ;;; Basic Programming Modes
 

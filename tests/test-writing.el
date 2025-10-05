@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'test-helper)
+(require 'writing)
 
 ;;; Org-mode Basic Configuration
 

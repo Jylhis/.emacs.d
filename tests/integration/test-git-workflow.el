@@ -7,6 +7,8 @@
 ;;; Code:
 
 (require 'test-helper)
+;; Integration tests need full config loaded
+(load (expand-file-name "init.el" test-user-emacs-directory))
 
 ;;; Magit Workflow
 
