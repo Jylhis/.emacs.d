@@ -18,9 +18,9 @@
 (add-to-list 'load-path (expand-file-name "config" test-user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "lisp" test-user-emacs-directory))
 
-;; Set user-emacs-directory to test sandbox to avoid write errors
-(setq user-emacs-directory
-      (expand-file-name "sandbox" (file-name-directory load-file-name)))
+;; Keep user-emacs-directory pointing to the real config directory
+;; This is needed for (require 'utils) and other relative requires to work
+(setq user-emacs-directory test-user-emacs-directory)
 
 ;; Mock package.el to prevent installation in tests
 (defun test-helper-mock-package-system ()
@@ -35,13 +35,21 @@
 ;; Always mock package system in tests
 (test-helper-mock-package-system)
 
+;; Mock write operations to prevent errors in read-only Nix sandbox
+(defun test-helper-mock-write-operations ()
+  "Mock file write operations that fail in read-only environments."
+  ;; Mock savehist save function
+  (advice-add 'savehist-save :override #'ignore)
+  ;; Mock recentf save function
+  (advice-add 'recentf-save-list :override #'ignore)
+  ;; Mock super-save
+  (advice-add 'super-save-command :override #'ignore)
+  (advice-add 'super-save-command-advice :override #'ignore))
+
+(test-helper-mock-write-operations)
+
 ;; Load only platform detection (required by many modules)
 (require 'platform)
-
-;; Disable features that require write access
-(setq savehist-mode nil)
-(setq recentf-mode nil)
-(setq super-save-mode nil)
 
 ;; Individual test files will load modules as needed using (require 'module-name)
 
