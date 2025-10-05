@@ -16,7 +16,7 @@
   "Verify problematic default keybindings are unbound."
   :tags '(unit fast keybindings critical)
   (should (null (key-binding (kbd "C-z"))))      ; suspend-frame disabled
-  (should (null (key-binding (kbd "C-x C-z")))))) ; suspend-frame disabled
+  (should (null (key-binding (kbd "C-x C-z"))))) ; suspend-frame disabled
 
 (ert-deftest test-essential-navigation-keys ()
   "Verify essential navigation keybindings."
