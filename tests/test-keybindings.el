@@ -7,8 +7,9 @@
 ;;; Code:
 
 (require 'test-helper)
-;; Load init.el to have all keybindings registered
-(load (expand-file-name "init.el" test-user-emacs-directory))
+;; Load init.el to have all keybindings registered (load only if not already loaded)
+(unless (featurep 'init)
+  (load (expand-file-name "init.el" test-user-emacs-directory)))
 
 ;;; Global Essential Keybindings
 

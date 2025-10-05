@@ -7,8 +7,9 @@
 ;;; Code:
 
 (require 'test-helper)
-;; Integration tests need full config loaded
-(load (expand-file-name "init.el" test-user-emacs-directory))
+;; Integration tests need full config loaded (load only if not already loaded)
+(unless (featurep 'init)
+  (load (expand-file-name "init.el" test-user-emacs-directory)))
 
 ;;; Eglot Activation
 
