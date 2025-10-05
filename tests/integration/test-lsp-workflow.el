@@ -16,11 +16,13 @@
 (ert-deftest test-eglot-mode-activation ()
   "Test eglot-ensure is configured for prog-modes."
   :tags '(integration lsp)
+  (require 'eglot)
   (should (member 'prog-mode-hook (mapcar #'car hook-list))))
 
 (ert-deftest test-eglot-in-python-mode ()
   "Test eglot activates in python-mode."
   :tags '(integration lsp)
+  (require 'eglot)
   (test-helper-with-temp-buffer-mode 'python-mode
     ;; Eglot should be in the hook
     (should (member 'eglot-ensure python-mode-hook))))
@@ -66,6 +68,7 @@
   "Test consult-eglot provides symbol search."
   :tags '(integration lsp)
   (when (test-helper-package-available-p 'consult-eglot)
+    (require 'consult-eglot)
     (should (commandp 'consult-eglot-symbols))
     (let ((map eglot-mode-map))
       (should (eq (lookup-key map (kbd "C-M-.")) 'consult-eglot-symbols)))))
@@ -109,6 +112,7 @@
 (ert-deftest test-eglot-eldoc-integration ()
   "Test eglot integrates with eldoc."
   :tags '(integration lsp)
+  (require 'eglot)
   (should (member 'eldoc-mode eglot-managed-mode-hook)))
 
 ;;; Inlay Hints
@@ -116,6 +120,7 @@
 (ert-deftest test-eglot-inlay-hints ()
   "Test eglot inlay hints configuration."
   :tags '(integration lsp)
+  (require 'eglot)
   (when (fboundp 'eglot-inlay-hints-mode)
     (should (member 'eglot-managed-mode-hook (mapcar #'car hook-list)))))
 

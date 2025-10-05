@@ -13,6 +13,7 @@
 (ert-deftest test-help-at-pt-configuration ()
   "Verify help-at-pt configuration."
   :tags '(unit fast help)
+  (require 'help-at-pt)
   (should (eq help-at-pt-display-when-idle t)))
 
 ;;; Helpful
@@ -20,6 +21,7 @@
 (ert-deftest test-helpful-keybindings ()
   "Verify helpful keybindings."
   :tags '(unit fast help keybindings)
+  (require 'helpful)
   (should (eq (key-binding (kbd "C-h f")) 'helpful-callable))
   (should (eq (key-binding (kbd "C-h v")) 'helpful-variable))
   (should (eq (key-binding (kbd "C-h k")) 'helpful-key))
@@ -40,6 +42,7 @@
 (ert-deftest test-apropos-configuration ()
   "Verify apropos configuration."
   :tags '(unit fast help)
+  (require 'apropos)
   (should (eq apropos-do-all t)))
 
 ;;; Dash-docs
@@ -48,6 +51,7 @@
   "Verify dash-docs configuration."
   :tags '(unit help)
   (when (test-helper-package-available-p 'dash-docs)
+    (require 'dash-docs)
     (should (boundp 'dash-docs-docsets-path))
     (should (stringp dash-docs-docsets-path))
     (should (eq dash-docs-enable-debugging nil))
@@ -57,6 +61,7 @@
   "Verify dash-docs mode-specific hooks."
   :tags '(unit help)
   (when (test-helper-package-available-p 'dash-docs)
+    (require 'dash-docs)
     ;; Test that hooks are set up for specific modes
     (test-helper-with-temp-buffer-mode 'emacs-lisp-mode
       (should (boundp 'dash-docs-docsets)))))

@@ -9,7 +9,8 @@
 (require 'ert)
 
 ;; Only run these tests if auth-source-1password is available
-(when (featurep 'auth-source-1password)
+(when (locate-library "auth-source-1password")
+  (require 'systems)  ; Load the configuration
 
   (ert-deftest test-auth-source-1password-package-loaded ()
     "Test that auth-source-1password package is properly loaded."
@@ -24,7 +25,7 @@
     (should (boundp 'auth-source-1password-op-executable))
     (should (boundp 'auth-source-1password-debug))
     (should (boundp 'auth-source-1password-cache-ttl))
-    
+
     ;; Test default values are reasonable
     (should (stringp auth-source-1password-vault))
     (should (stringp auth-source-1password-op-executable))
@@ -56,7 +57,7 @@
     (should (member "url" auth-source-1password-search-fields))))
 
 ;; Provide a test for when the package is not available
-(unless (featurep 'auth-source-1password)
+(unless (locate-library "auth-source-1password")
   (ert-deftest test-auth-source-1password-not-available ()
     "Test behavior when auth-source-1password is not available."
     (should-not (featurep 'auth-source-1password))

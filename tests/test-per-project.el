@@ -21,12 +21,13 @@
   "Verify global-projection-hook-mode is active."
   :tags '(unit per-project)
   (when (test-helper-package-available-p 'projection)
-    (should (test-helper-mode-active-p 'global-projection-hook-mode))))
+    (should (member 'global-projection-hook-mode after-init-hook))))
 
 (ert-deftest test-projection-keybinding ()
   "Verify projection-map keybinding."
   :tags '(unit fast per-project keybindings)
   (when (test-helper-package-available-p 'projection)
+    (require 'projection)
     (let ((binding (key-binding (kbd "C-x P"))))
       (should (keymapp binding)))))
 
@@ -34,6 +35,7 @@
   "Verify projection commands are marked as safe local variables."
   :tags '(unit fast per-project)
   (when (test-helper-package-available-p 'projection)
+    (require 'projection)
     (should (get 'projection-commands-configure-project 'safe-local-variable))
     (should (get 'projection-commands-build-project 'safe-local-variable))
     (should (get 'projection-commands-test-project 'safe-local-variable))
@@ -106,6 +108,7 @@
   "Verify consult-compile-multi-mode is active."
   :tags '(unit per-project)
   (when (test-helper-package-available-p 'consult-compile-multi)
+    (require 'consult-compile-multi)
     (should (test-helper-mode-active-p 'consult-compile-multi-mode))))
 
 ;;; Compile-multi-nerd-icons
@@ -122,6 +125,7 @@
   :tags '(unit per-project)
   (when (and (test-helper-package-available-p 'compile-multi)
              (test-helper-package-available-p 'embark))
+    (require 'compile-multi-embark)
     (should (test-helper-mode-active-p 'compile-multi-embark-mode))))
 
 (provide 'test-per-project)

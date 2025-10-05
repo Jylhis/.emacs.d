@@ -31,6 +31,7 @@
 (ert-deftest test-corfu-completion-in-buffer ()
   "Test corfu provides completion in buffer."
   :tags '(integration completion)
+  (require 'cape)
   (test-helper-with-temp-buffer-mode 'emacs-lisp-mode
     (should (test-helper-mode-active-p 'corfu-mode))
     (insert "(defun test-fun")
@@ -74,6 +75,7 @@
 (ert-deftest test-find-file-completion ()
   "Test file finding with completion."
   :tags '(integration completion workflow)
+  (require 'vertico)
   (with-test-sandbox
     (test-helper-create-temp-file "test-file.txt" "content")
     (test-helper-create-temp-file "test-file-2.txt" "content")
@@ -105,6 +107,7 @@
 (ert-deftest test-cape-integration ()
   "Test cape completion functions are integrated."
   :tags '(integration completion)
+  (require 'cape)
   (should (member 'cape-file completion-at-point-functions))
   (should (member 'cape-dabbrev completion-at-point-functions))
   (should (member 'cape-keyword completion-at-point-functions)))
@@ -115,6 +118,7 @@
   "Test embark and consult work together."
   :tags '(integration completion)
   (when (test-helper-package-available-p 'embark-consult)
+    (require 'embark-consult)
     (should (member 'consult-preview-at-point-mode embark-collect-mode-hook))))
 
 (provide 'test-completion-workflow)

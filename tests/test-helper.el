@@ -27,6 +27,12 @@
 (setq package-enable-at-startup nil)
 (package-initialize)
 
+;; Load use-package (built-in in Emacs 29+)
+;; Required for config modules that use use-package declarations
+(require 'use-package)
+;; Disable automatic package installation in tests
+(setq use-package-always-ensure nil)
+
 ;; Mock package.el to prevent installation in tests
 (defun test-helper-mock-package-system ()
   "Mock package.el functions to prevent installation in tests."

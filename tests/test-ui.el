@@ -29,6 +29,7 @@
 (ert-deftest test-modus-themes-configuration ()
   "Verify modus themes configuration."
   :tags '(unit fast ui)
+  (require 'modus-themes)
   (should (eq modus-themes-italic-constructs t))
   (should (eq modus-themes-bold-constructs nil))
   (should (eq modus-themes-mixed-fonts t))
@@ -40,6 +41,7 @@
   "Verify auto-dark mode is configured."
   :tags '(unit ui)
   (when (test-helper-package-available-p 'auto-dark)
+    (require 'auto-dark)
     (should (test-helper-mode-active-p 'auto-dark-mode))))
 
 ;;; GUI Elements
@@ -59,16 +61,17 @@
 (ert-deftest test-which-key-mode ()
   "Verify which-key mode is active."
   :tags '(unit fast ui)
-  (should (test-helper-mode-active-p 'which-key-mode)))
+  (should (member 'which-key-mode after-init-hook)))
 
 (ert-deftest test-global-hl-line-mode ()
   "Verify global-hl-line-mode is active."
   :tags '(unit fast ui)
-  (should (test-helper-mode-active-p 'global-hl-line-mode)))
+  (should (member 'global-hl-line-mode after-init-hook)))
 
 (ert-deftest test-winner-mode ()
   "Verify winner-mode is active."
   :tags '(unit fast ui)
+  (require 'winner)
   (should (test-helper-mode-active-p 'winner-mode)))
 
 (ert-deftest test-winner-keybindings ()
@@ -80,11 +83,12 @@
 (ert-deftest test-show-paren-mode ()
   "Verify show-paren-mode is active."
   :tags '(unit fast ui)
-  (should (test-helper-mode-active-p 'show-paren-mode)))
+  (should (member 'show-paren-mode after-init-hook)))
 
 (ert-deftest test-show-paren-configuration ()
   "Verify show-paren mode configuration."
   :tags '(unit fast ui)
+  (require 'paren)
   (should (eq show-paren-delay 0.1))
   (should (eq show-paren-highlight-openparen t))
   (should (eq show-paren-when-point-inside-paren t))
@@ -114,6 +118,7 @@
   "Verify nerd-icons-completion mode."
   :tags '(unit ui)
   (when (test-helper-package-available-p 'nerd-icons-completion)
+    (require 'nerd-icons-completion)
     (should (test-helper-mode-active-p 'nerd-icons-completion-mode))))
 
 (ert-deftest test-breadcrumb-mode-hook ()

@@ -13,6 +13,7 @@
 (ert-deftest test-vertico-mode ()
   "Verify vertico-mode is active."
   :tags '(unit fast completion)
+  (require 'vertico)
   (should (test-helper-mode-active-p 'vertico-mode)))
 
 (ert-deftest test-vertico-directory-keybindings ()
@@ -28,6 +29,7 @@
 (ert-deftest test-vertico-multiform-mode ()
   "Verify vertico-multiform-mode is active."
   :tags '(unit completion)
+  (require 'vertico-multiform)
   (should (test-helper-mode-active-p 'vertico-multiform-mode)))
 
 ;;; Corfu
@@ -35,11 +37,13 @@
 (ert-deftest test-global-corfu-mode ()
   "Verify global-corfu-mode is active."
   :tags '(unit fast completion)
+  (require 'corfu)
   (should (test-helper-mode-active-p 'global-corfu-mode)))
 
 (ert-deftest test-corfu-history-mode ()
   "Verify corfu-history-mode is active."
   :tags '(unit fast completion)
+  (require 'corfu)
   (should (test-helper-mode-active-p 'corfu-history-mode)))
 
 ;;; Cape
@@ -47,6 +51,7 @@
 (ert-deftest test-cape-completion-functions ()
   "Verify cape completion functions are registered."
   :tags '(unit fast completion)
+  (require 'cape)
   (should (member 'cape-file completion-at-point-functions))
   (should (member 'cape-dabbrev completion-at-point-functions))
   (should (member 'cape-keyword completion-at-point-functions)))
@@ -89,6 +94,7 @@
 (ert-deftest test-marginalia-mode ()
   "Verify marginalia-mode is active."
   :tags '(unit fast completion)
+  (require 'marginalia)
   (should (test-helper-mode-active-p 'marginalia-mode)))
 
 ;;; Embark
@@ -119,6 +125,7 @@
 (ert-deftest test-avy-all-windows ()
   "Verify avy is configured for all windows."
   :tags '(unit fast completion)
+  (require 'avy)
   (should (eq avy-all-windows 'all-frames)))
 
 ;;; Zoxide
@@ -140,6 +147,9 @@
 (ert-deftest test-completion-framework-integration ()
   "Verify completion framework components work together."
   :tags '(unit completion)
+  (require 'vertico)
+  (require 'corfu)
+  (require 'marginalia)
   (should (test-helper-mode-active-p 'vertico-mode))
   (should (test-helper-mode-active-p 'global-corfu-mode))
   (should (test-helper-mode-active-p 'marginalia-mode))

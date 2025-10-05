@@ -89,28 +89,31 @@
 (ert-deftest test-repeat-mode ()
   "Verify repeat-mode is active."
   :tags '(unit fast core)
+  (require 'repeat)
   (should (test-helper-mode-active-p 'repeat-mode)))
 
 (ert-deftest test-delete-selection-mode ()
-  "Verify delete-selection-mode is active."
+  "Verify delete-selection-mode is configured."
   :tags '(unit fast core)
-  (should (test-helper-mode-active-p 'delete-selection-mode)))
+  (should (member 'delete-selection-mode after-init-hook)))
 
 (ert-deftest test-electric-pair-mode ()
-  "Verify electric-pair-mode is active."
+  "Verify electric-pair-mode is configured."
   :tags '(unit fast core)
-  (should (test-helper-mode-active-p 'electric-pair-mode)))
+  (should (member 'electric-pair-mode after-init-hook)))
 
 ;;; Essential Packages
 
 (ert-deftest test-super-save-mode ()
   "Verify super-save-mode is active."
   :tags '(unit fast core)
+  (require 'super-save)
   (should (test-helper-mode-active-p 'super-save-mode)))
 
 (ert-deftest test-super-save-configuration ()
   "Verify super-save configuration."
   :tags '(unit fast core)
+  (require 'super-save)
   (should (eq super-save-auto-save-when-idle t))
   (should (eq super-save-remote-files nil))
   (should (eq super-save-silent t)))

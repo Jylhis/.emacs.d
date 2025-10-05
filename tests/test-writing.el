@@ -24,6 +24,7 @@
 (ert-deftest test-org-clock-persist ()
   "Verify org-clock persistence."
   :tags '(unit fast writing)
+  (require 'org)
   (should (eq org-clock-persist 'history)))
 
 ;;; Org Keybindings
@@ -68,6 +69,7 @@
   "Verify org-appear-mode hook."
   :tags '(unit writing)
   (when (test-helper-package-available-p 'org-appear)
+    (require 'org-appear)
     (should (member 'org-appear-mode org-mode-hook))))
 
 ;;; Org-modern
@@ -76,6 +78,7 @@
   "Verify org-modern is configured."
   :tags '(unit writing)
   (when (test-helper-package-available-p 'org-modern)
+    (require 'org-modern)
     (should (test-helper-mode-active-p 'global-org-modern-mode))))
 
 ;;; Org Exporters

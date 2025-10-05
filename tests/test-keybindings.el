@@ -134,6 +134,7 @@
   "Verify project management keybindings."
   :tags '(unit fast keybindings)
   (when (test-helper-package-available-p 'projection)
+    (require 'projection)
     (let ((binding (key-binding (kbd "C-x P"))))
       (should (keymapp binding)))))
 
@@ -158,6 +159,7 @@
   "Verify all critical workflow keybindings are set.
 This test ensures that the most important daily-use keybindings are available."
   :tags '(unit keybindings critical)
+  (require 'helpful)
   (let ((critical-bindings '(("C-c g" . magit-status)        ; Git
                              ("C-x b" . consult-buffer)       ; Buffer switching
                              ("C-s" . consult-line)           ; Search in buffer

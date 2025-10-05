@@ -28,6 +28,7 @@
   "Verify global-treesit-auto-mode is active."
   :tags '(unit programming)
   (when (test-helper-package-available-p 'treesit-auto)
+    (require 'treesit-auto)
     (should (test-helper-mode-active-p 'global-treesit-auto-mode))))
 
 ;;; Flymake
@@ -71,6 +72,7 @@
 (ert-deftest test-eglot-configuration ()
   "Verify eglot basic configuration."
   :tags '(unit fast programming)
+  (require 'eglot)
   (should (eq eglot-send-changes-idle-time 0.5))
   (should (eq eglot-autoshutdown t))
   (should (eq eglot-events-buffer-size 0))
@@ -80,6 +82,7 @@
 (ert-deftest test-eglot-hooks ()
   "Verify eglot activates for appropriate modes."
   :tags '(unit programming)
+  (require 'eglot)
   ;; Check that eglot-ensure is in prog-mode-hook with exclusions
   (should (member 'prog-mode-hook (mapcar #'car hook-list))))
 
@@ -114,6 +117,7 @@
   "Verify direnv-mode when direnv is available."
   :tags '(unit programming)
   (when (executable-find "direnv")
+    (require 'direnv)
     (should (test-helper-mode-active-p 'direnv-mode))))
 
 ;;; Debugging
@@ -136,6 +140,7 @@
 (ert-deftest test-wgrep-configuration ()
   "Verify wgrep configuration."
   :tags '(unit fast programming)
+  (require 'wgrep)
   (should (eq wgrep-auto-save-buffer t))
   (should (eq wgrep-change-readonly-file t)))
 
@@ -172,6 +177,7 @@
   "Verify web-mode configuration."
   :tags '(unit programming)
   (when (test-helper-package-available-p 'web-mode)
+    (require 'web-mode)
     (should (eq web-mode-markup-indent-offset 2))
     (should (eq web-mode-css-indent-offset 2))
     (should (eq web-mode-code-indent-offset 2))))
@@ -198,6 +204,7 @@
 (ert-deftest test-editorconfig-mode ()
   "Verify editorconfig-mode is active."
   :tags '(unit programming)
+  (require 'editorconfig)
   (should (test-helper-mode-active-p 'editorconfig-mode)))
 
 ;;; Eldoc
@@ -205,6 +212,7 @@
 (ert-deftest test-eldoc-configuration ()
   "Verify eldoc configuration."
   :tags '(unit fast programming)
+  (require 'eldoc)
   (should (eq eldoc-idle-delay 0.5))
   (should (eq eldoc-print-after-edit t)))
 
@@ -213,7 +221,9 @@
 (ert-deftest test-xterm-mouse ()
   "Verify xterm mouse mode."
   :tags '(unit programming)
-  (should (eq xterm-mouse-mode 1)))
+  (require 'xt-mouse)
+  (should (boundp 'xterm-mouse-mode))
+  (should xterm-mouse-mode))
 
 (provide 'test-programming)
 ;;; test-programming.el ends here
