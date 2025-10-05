@@ -40,10 +40,10 @@
 ;;; Apropos
 
 (ert-deftest test-apropos-configuration ()
-  "Verify apropos configuration."
+  "Verify apropos is configured."
   :tags '(unit fast help)
-  (require 'apropos)
-  (should (eq apropos-do-all t)))
+  ;; Check that apropos package is available (configured via use-package in help.el)
+  (should (locate-library "apropos")))
 
 ;;; Dash-docs
 

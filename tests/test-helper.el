@@ -32,6 +32,8 @@
 (require 'use-package)
 ;; Disable automatic package installation in tests
 (setq use-package-always-ensure nil)
+;; Expand use-package forms at load time (required for :custom to work in batch mode)
+(setq use-package-expand-minimally nil)
 
 ;; Mock package.el to prevent installation in tests
 (defun test-helper-mock-package-system ()
@@ -63,6 +65,12 @@
 
 ;; Load only platform detection (required by many modules)
 (require 'platform)
+
+;; Helper to ensure use-package configuration is applied
+(defun test-helper-ensure-package-loaded (package)
+  "Ensure PACKAGE is loaded and use-package config is applied.
+This forces deferred packages to load immediately in tests."
+  (require package nil t))
 
 ;; Individual test files will load modules as needed using (require 'module-name)
 
