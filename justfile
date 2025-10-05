@@ -42,19 +42,73 @@ test-nmt:
     @echo "Running: test-fileset-source"
     nix build .#checks.x86_64-linux.test-fileset-source --print-build-logs
 
-# Run unit tests with verbose output (legacy direct execution)
+# Run only fast unit tests
+[group('check')]
+test-unit:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Running fast unit tests..."
+    emacs -Q --batch \
+        --eval "(progn (add-to-list 'load-path \"{{config_dir}}\") (add-to-list 'load-path \"{{config_dir}}/lisp\") (add-to-list 'load-path \"{{config_dir}}/tests\") (add-to-list 'load-path \"{{config_dir}}/config\"))" \
+        --load "{{config_dir}}/tests/test-helper.el" \
+        --load "{{config_dir}}/tests/test-config-loading.el" \
+        --load "{{config_dir}}/tests/test-core.el" \
+        --load "{{config_dir}}/tests/test-fonts.el" \
+        --load "{{config_dir}}/tests/test-ui.el" \
+        --load "{{config_dir}}/tests/test-completion.el" \
+        --load "{{config_dir}}/tests/test-programming.el" \
+        --load "{{config_dir}}/tests/test-git.el" \
+        --load "{{config_dir}}/tests/test-writing.el" \
+        --load "{{config_dir}}/tests/test-help.el" \
+        --load "{{config_dir}}/tests/test-per-project.el" \
+        --load "{{config_dir}}/tests/test-keybindings.el" \
+        --load "{{config_dir}}/tests/test-android.el" \
+        --load "{{config_dir}}/tests/test-utils.el" \
+        --load "{{config_dir}}/tests/test-platform.el" \
+        --load "{{config_dir}}/tests/test-auth-source-1password.el" \
+        --eval "(ert-run-tests-batch-and-exit '(tag fast))"
+
+# Run integration tests (slower, may require external dependencies)
+[group('check')]
+test-integration:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Running integration tests..."
+    emacs -Q --batch \
+        --eval "(progn (add-to-list 'load-path \"{{config_dir}}\") (add-to-list 'load-path \"{{config_dir}}/lisp\") (add-to-list 'load-path \"{{config_dir}}/tests\") (add-to-list 'load-path \"{{config_dir}}/config\"))" \
+        --load "{{config_dir}}/tests/test-helper.el" \
+        --load "{{config_dir}}/tests/integration/test-completion-workflow.el" \
+        --load "{{config_dir}}/tests/integration/test-lsp-workflow.el" \
+        --load "{{config_dir}}/tests/integration/test-git-workflow.el" \
+        --eval "(ert-run-tests-batch-and-exit '(tag integration))"
+
+# Run unit tests with verbose output (all tests, direct execution)
 [group('check')]
 test-verbose:
     #!/usr/bin/env bash
     set -euo pipefail
-    echo "Running ERT unit tests (verbose, direct execution)..."
+    echo "Running all ERT tests (verbose, direct execution)..."
     emacs -Q --batch \
-        --eval "(progn (add-to-list 'load-path \"{{config_dir}}/lisp\") (add-to-list 'load-path \"{{config_dir}}/tests\") (add-to-list 'load-path \"{{config_dir}}/config\"))" \
-        --eval "(require 'ert)" \
-        --eval "(require 'cl-lib)" \
+        --eval "(progn (add-to-list 'load-path \"{{config_dir}}\") (add-to-list 'load-path \"{{config_dir}}/lisp\") (add-to-list 'load-path \"{{config_dir}}/tests\") (add-to-list 'load-path \"{{config_dir}}/config\"))" \
+        --load "{{config_dir}}/tests/test-helper.el" \
+        --load "{{config_dir}}/tests/test-config-loading.el" \
+        --load "{{config_dir}}/tests/test-core.el" \
+        --load "{{config_dir}}/tests/test-fonts.el" \
+        --load "{{config_dir}}/tests/test-ui.el" \
+        --load "{{config_dir}}/tests/test-completion.el" \
+        --load "{{config_dir}}/tests/test-programming.el" \
+        --load "{{config_dir}}/tests/test-git.el" \
+        --load "{{config_dir}}/tests/test-writing.el" \
+        --load "{{config_dir}}/tests/test-help.el" \
+        --load "{{config_dir}}/tests/test-per-project.el" \
+        --load "{{config_dir}}/tests/test-keybindings.el" \
+        --load "{{config_dir}}/tests/test-android.el" \
         --load "{{config_dir}}/tests/test-utils.el" \
         --load "{{config_dir}}/tests/test-platform.el" \
         --load "{{config_dir}}/tests/test-auth-source-1password.el" \
+        --load "{{config_dir}}/tests/integration/test-completion-workflow.el" \
+        --load "{{config_dir}}/tests/integration/test-lsp-workflow.el" \
+        --load "{{config_dir}}/tests/integration/test-git-workflow.el" \
         --eval "(ert-run-tests-batch-and-exit t)"
 
 # Run elisp-lint on all Emacs Lisp files
@@ -173,21 +227,30 @@ info-nix:
 # Show available Nix checks
 [group('info')]
 info-checks:
-    @echo "Available Nix Checks:"
-    @echo "===================="
-    @echo "ERT Tests:"
-    @echo "  - emacs-tests"
+    @echo "Available Test Commands:"
+    @echo "======================="
     @echo ""
-    @echo "NMT Tests:"
+    @echo "Quick Testing:"
+    @echo "  just test-unit         - Fast unit tests only (recommended for development)"
+    @echo "  just test-integration  - Integration tests (may require external tools)"
+    @echo "  just test-verbose      - All ERT tests with detailed output"
+    @echo ""
+    @echo "Nix-based Testing:"
+    @echo "  just test              - ERT unit tests via Nix"
+    @echo "  just test-nmt          - Home-manager module tests"
+    @echo "  just test-all          - All tests (ERT + NMT via Nix)"
+    @echo ""
+    @echo "Available Test Files:"
+    @echo "  Unit tests:            $(ls -1 {{config_dir}}/tests/test-*.el | wc -l) files"
+    @echo "  Integration tests:     $(ls -1 {{config_dir}}/tests/integration/test-*.el 2>/dev/null | wc -l) files"
+    @echo ""
+    @echo "NMT Checks:"
     @echo "  - test-emacs-config-files"
     @echo "  - test-shell-aliases"
     @echo "  - test-emacs-service"
     @echo "  - test-font-packages"
     @echo "  - test-module-disabled"
     @echo "  - test-fileset-source"
-    @echo ""
-    @echo "Other Checks:"
-    @echo "  - formatting"
 
 # Update flake inputs
 [group('nix')]
