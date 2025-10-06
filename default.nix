@@ -123,14 +123,31 @@ emacsWithPackages.overrideAttrs (oldAttrs: {
       echo "Running Emacs configuration tests..."
       ${emacsWithPackages}/bin/emacs -Q --batch \
         --eval "(progn \
+                  (add-to-list 'load-path \"${./.}\") \
                   (add-to-list 'load-path \"${./.}/lisp\") \
                   (add-to-list 'load-path \"${./.}/tests\") \
                   (add-to-list 'load-path \"${./.}/config\"))" \
         --eval "(require 'ert)" \
         --eval "(require 'cl-lib)" \
+        --load "${./.}/tests/test-helper.el" \
+        --load "${./.}/tests/test-config-loading.el" \
+        --load "${./.}/tests/test-core.el" \
+        --load "${./.}/tests/test-fonts.el" \
+        --load "${./.}/tests/test-ui.el" \
+        --load "${./.}/tests/test-completion.el" \
+        --load "${./.}/tests/test-programming.el" \
+        --load "${./.}/tests/test-git.el" \
+        --load "${./.}/tests/test-writing.el" \
+        --load "${./.}/tests/test-help.el" \
+        --load "${./.}/tests/test-per-project.el" \
+        --load "${./.}/tests/test-keybindings.el" \
+        --load "${./.}/tests/test-android.el" \
         --load "${./.}/tests/test-utils.el" \
         --load "${./.}/tests/test-platform.el" \
         --load "${./.}/tests/test-auth-source-1password.el" \
+        --load "${./.}/tests/integration/test-completion-workflow.el" \
+        --load "${./.}/tests/integration/test-lsp-workflow.el" \
+        --load "${./.}/tests/integration/test-git-workflow.el" \
         --eval "(ert-run-tests-batch-and-exit)"
       echo "All tests passed!"
       touch $out

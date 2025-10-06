@@ -264,6 +264,188 @@ let
       echo "Fileset structure tests passed!"
       touch $out
     '';
+
+    # Test 7: Developer tools are installed when enabled
+    test-developer-tools-enabled = mkTest "developer-tools-enabled" ''
+      set -euo pipefail
+
+      echo "Building test home-manager configuration with developer tools..."
+      homeConfig="${
+        buildHomeConfig [
+          {
+            programs.emacs = {
+              enable = true;
+              userConfig = ./..;
+              developerTools = {
+                enable = true;
+                languages = {
+                  python = true;
+                  rust = true;
+                  nix = true;
+                };
+              };
+            };
+          }
+        ]
+      }"
+
+      echo "Checking if developer tools are installed..."
+
+      # Check for Python tools
+      if [ -x "$homeConfig/home-path/bin/pyright" ]; then
+        echo "PASS: pyright is installed"
+      else
+        echo "FAIL: pyright not found"
+        exit 1
+      fi
+
+      # Check for Rust tools
+      if [ -x "$homeConfig/home-path/bin/rust-analyzer" ]; then
+        echo "PASS: rust-analyzer is installed"
+      else
+        echo "FAIL: rust-analyzer not found"
+        exit 1
+      fi
+
+      # Check for Nix tools
+      if [ -x "$homeConfig/home-path/bin/nil" ]; then
+        echo "PASS: nil is installed"
+      else
+        echo "FAIL: nil not found"
+        exit 1
+      fi
+
+      echo "Developer tools enabled tests passed!"
+      touch $out
+    '';
+
+    # Test 8: Developer tools are not installed when disabled
+    test-developer-tools-disabled = mkTest "developer-tools-disabled" ''
+      set -euo pipefail
+
+      echo "Building test home-manager configuration without developer tools..."
+      homeConfig="${
+        buildHomeConfig [
+          {
+            programs.emacs = {
+              enable = true;
+              userConfig = ./..;
+              developerTools.enable = false;
+            };
+          }
+        ]
+      }"
+
+      echo "Checking that developer tools are not installed..."
+
+      # These tools should not be present
+      if [ -x "$homeConfig/home-path/bin/pyright" ]; then
+        echo "FAIL: pyright should not be installed"
+        exit 1
+      else
+        echo "PASS: pyright is not installed (expected)"
+      fi
+
+      echo "Developer tools disabled tests passed!"
+      touch $out
+    '';
+
+    # Test 9: Selective language enablement
+    test-developer-tools-selective = mkTest "developer-tools-selective" ''
+      set -euo pipefail
+
+      echo "Building test home-manager configuration with selective tools..."
+      homeConfig="${
+        buildHomeConfig [
+          {
+            programs.emacs = {
+              enable = true;
+              userConfig = ./..;
+              developerTools = {
+                enable = true;
+                languages = {
+                  go = true;
+                  bash = true;
+                };
+              };
+            };
+          }
+        ]
+      }"
+
+      echo "Checking selective language installation..."
+
+      # Go tools should be present
+      if [ -x "$homeConfig/home-path/bin/gopls" ]; then
+        echo "PASS: gopls is installed"
+      else
+        echo "FAIL: gopls not found"
+        exit 1
+      fi
+
+      # Bash tools should be present
+      if [ -x "$homeConfig/home-path/bin/shellcheck" ]; then
+        echo "PASS: shellcheck is installed"
+      else
+        echo "FAIL: shellcheck not found"
+        exit 1
+      fi
+
+      # Python tools should NOT be present
+      if [ -x "$homeConfig/home-path/bin/pyright" ]; then
+        echo "FAIL: pyright should not be installed"
+        exit 1
+      else
+        echo "PASS: pyright is not installed (expected)"
+      fi
+
+      echo "Selective language tests passed!"
+      touch $out
+    '';
+
+    # Test 10: Extra packages work correctly
+    test-developer-tools-extra = mkTest "developer-tools-extra" ''
+      set -euo pipefail
+
+      echo "Building test home-manager configuration with extra packages..."
+      homeConfig="${
+        buildHomeConfig [
+          {
+            programs.emacs = {
+              enable = true;
+              userConfig = ./..;
+              developerTools = {
+                enable = true;
+                extraPackages = with pkgs; [
+                  jq
+                  ripgrep
+                ];
+              };
+            };
+          }
+        ]
+      }"
+
+      echo "Checking extra packages installation..."
+
+      # Extra packages should be present
+      if [ -x "$homeConfig/home-path/bin/jq" ]; then
+        echo "PASS: jq is installed"
+      else
+        echo "FAIL: jq not found"
+        exit 1
+      fi
+
+      if [ -x "$homeConfig/home-path/bin/rg" ]; then
+        echo "PASS: ripgrep is installed"
+      else
+        echo "FAIL: ripgrep not found"
+        exit 1
+      fi
+
+      echo "Extra packages tests passed!"
+      touch $out
+    '';
   };
 in
 tests

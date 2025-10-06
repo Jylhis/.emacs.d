@@ -42,6 +42,28 @@ Validates fileset-based source handling:
 - Verifies key files are present (init.el, early-init.el)
 - Confirms directory structure is preserved
 
+### test-developer-tools-enabled
+Validates developer tools installation when enabled:
+- Checks Python tools (pyright, ruff, black) are installed
+- Verifies Rust tools (rust-analyzer, rustfmt, clippy) are present
+- Confirms Nix tools (nil, nixfmt, statix, deadnix) are available
+
+### test-developer-tools-disabled
+Validates no developer tools are installed when disabled:
+- Confirms tools are not present when `developerTools.enable = false`
+- Ensures clean environment without unnecessary packages
+
+### test-developer-tools-selective
+Validates selective language enablement:
+- Checks only enabled language tools are installed (Go, Bash)
+- Verifies disabled language tools are not present (Python)
+- Confirms granular control over tool installation
+
+### test-developer-tools-extra
+Validates extraPackages functionality:
+- Checks custom packages (jq, ripgrep) are installed
+- Verifies extra packages work alongside language-specific tools
+
 ## Running Tests
 
 ### Run all NMT tests

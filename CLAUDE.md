@@ -87,6 +87,39 @@ The home-manager module handles deployment of the Emacs configuration:
 - Controlled via `programs.emacs.enable` option
 - Configuration path specified via `programs.emacs.userConfig` option
 
+#### Developer Tools Installation
+The module supports optional installation of language servers, formatters, and linters for an IDE-like experience:
+
+```nix
+programs.emacs = {
+  enable = true;
+  developerTools = {
+    enable = true;  # Master switch (default: false)
+    languages = {
+      # Enable specific language toolsets
+      python = true;      # pyright, ruff, black
+      rust = true;        # rust-analyzer, rustfmt, clippy
+      go = true;          # gopls, gofumpt, golangci-lint
+      typescript = true;  # typescript-language-server, prettier, eslint
+      nix = true;         # nil, nixfmt, statix, deadnix
+      c-cpp = true;       # clang-tools (clangd, clang-format, clang-tidy)
+      bash = true;        # bash-language-server, shellcheck, shfmt
+      yaml = true;        # yaml-language-server
+      json = true;        # vscode-langservers-extracted
+      markdown = true;    # marksman
+    };
+    # Add additional tools beyond predefined language sets
+    extraPackages = with pkgs; [ jq ripgrep fd ];
+  };
+};
+```
+
+**Design:**
+- Opt-in by default to avoid unnecessary package installation
+- Language-based grouping for logical organization
+- Works seamlessly with Eglot configuration in programming.el
+- All tools are optional and independently toggleable
+
 ## Testing Approach
 
 This project uses two testing frameworks:
