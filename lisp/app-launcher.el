@@ -60,6 +60,9 @@
 (defvar app-launcher--cached-files nil
   "List of cached desktop files.")
 
+(defvar app-launcher-faulty-files nil
+  "List of faulty desktop files that couldn't be parsed.")
+
 (defun app-launcher-list-desktop-files ()
   "Return an alist of all Linux applications.
 Each list entry is a pair of (desktop-name . desktop-file).
@@ -105,7 +108,7 @@ This function always returns its elements in a stable order."
 
 	      (goto-char start)
 	      (unless (re-search-forward "^Name *= *\\(.+\\)$" end t)
-		(push file counsel-linux-apps-faulty)
+		(push file app-launcher-faulty-files)
 		(message "Warning: File %s has no Name" file)
 		(throw 'break nil))
 	      (setq name (match-string 1))
