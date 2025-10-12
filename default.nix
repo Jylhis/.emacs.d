@@ -1,5 +1,5 @@
 {
-  pkgs ? import <nixpkgs> { config.allowUnfree = true; },
+  pkgs,
   emacs ? pkgs.emacs,
 }:
 let
